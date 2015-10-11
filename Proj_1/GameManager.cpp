@@ -15,6 +15,10 @@ int startX, startY, tracking = 0;
 
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
+struct MyMesh mesh[963];
+struct MyMesh mesh_mesa[1];
+
+
 //External array storage defined in AVTmathLib.cpp
 
 /// The storage for matrices
@@ -37,18 +41,19 @@ unsigned int FrameCount = 0;
 int _WindowHandle = 0;
 int _WinX = 640, _WinY = 480;
 
-//mesh variables
-struct MyMesh mesh[961];
-
 // Frame counting and FPS computation
 long myTime,timebase = 0,frame = 0;
 char s[32];
 float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 
+Board* board;
+
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
     //to do
+	board = new Board();
+
 }
 
 GameManager::~GameManager(){
@@ -253,6 +258,7 @@ void GameManager::renderScene(void) {
 		//multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so is converted to eye space
 		//glUniform4fv(lPos_uniformId, 1, res);
 
+		
 	objId=0;
 	for (int i = 0 ; i < 31; ++i) {
 		for (int j = 0; j < 31; ++j) {
@@ -266,7 +272,7 @@ void GameManager::renderScene(void) {
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, -15.5 + i*1.0f, -0.5f, -15.5 + j*1.0f);
+			translate(MODEL, -15.5 + i*1.0f, -1.0f, -15.5 + j*1.0f);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -284,6 +290,62 @@ void GameManager::renderScene(void) {
 			objId++;
 		}
 	}
+	//objId=961;
+	// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh_mesa[0].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1,  mesh_mesa[0].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1,  mesh_mesa[0].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc, mesh_mesa[0].mat.shininess);
+			pushMatrix(MODEL);
+			translate(MODEL, 0.0f, 2.0f, 0.0f);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray( mesh_mesa[0].vao);
+			glDrawElements( mesh_mesa[0].type, mesh_mesa[0].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+
+
+			objId=962;
+	// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			translate(MODEL, -16.0f, -4.0f, -16.0f);
+			scale(MODEL, 32.0f, 3.0f, 32.0f);
+
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
 
 	glutSwapBuffers();
 }
@@ -332,7 +394,6 @@ void GameManager::init()
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camY = r *   						     sin(beta * 3.14f / 180.0f);
 
-
 	float amb[]= {0.1f, 0.1f, 0.1f, 1.0f};
 	float diff[] = {0.2f, 0.7f, 0.9f, 1.0f};
 	float spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
@@ -344,6 +405,10 @@ void GameManager::init()
 	float diff1[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float spec1[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	shininess=500.0;
+
+	float amb2[]= {0.2f, 0.2f, 0.2f, 1.0f};
+	float diff2[] = {1.0f, 0.43f, 0.09f, 1.0f};
+	float spec2[] = {0.633f, 0.728f, 0.633f, 1.0f};
 
 	//criacao do tabuleiro
 
@@ -371,11 +436,28 @@ void GameManager::init()
 		mesh[objId].mat.shininess = shininess;
 		mesh[objId].mat.texCount = texcount;
 		createCube();
-	}
+	}	
 
+		//objId=961;
 
-	//criacao da pista
-	
+		memcpy( mesh_mesa[0].mat.ambient, amb2,4*sizeof(float));
+		memcpy( mesh_mesa[0].mat.diffuse, diff2,4*sizeof(float));
+		memcpy( mesh_mesa[0].mat.specular, spec2,4*sizeof(float));
+		memcpy( mesh_mesa[0].mat.emissive, emissive,4*sizeof(float));
+		 mesh_mesa[0].mat.shininess = shininess;
+		 mesh_mesa[0].mat.texCount = texcount;
+		createSphere(2.0f, 10.0f);
+
+		objId=962;
+
+		memcpy(mesh[objId].mat.ambient, amb2,4*sizeof(float));
+		memcpy(mesh[objId].mat.diffuse, diff2,4*sizeof(float));
+		memcpy(mesh[objId].mat.specular, spec2,4*sizeof(float));
+		memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+		mesh[objId].mat.shininess = shininess;
+		mesh[objId].mat.texCount = texcount;
+		createCube();
+
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

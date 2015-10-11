@@ -8,6 +8,7 @@
 
 //includes of files .h from object classes of the game
 #include "Butter.h"
+#include "Board.h"
 #include "Car.h"
 #include "GameObject.h"
 #include "Orange.h"
