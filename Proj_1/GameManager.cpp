@@ -399,7 +399,9 @@ void GameManager::renderScene(void) {
 		}
 //track---------------------------------------------------------------------------------------
 			
-			objId=5;
+		objId=5;
+		int aux3;
+		for(aux3=0; aux3 < 30; ++aux3){
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
@@ -410,7 +412,11 @@ void GameManager::renderScene(void) {
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, -16.0f, -4.0f, -16.0f);
+			if(aux3<=16){
+				translate(MODEL, -11.0 + aux3 * 1.5f, 0.2f, -13.0f);
+			}else {
+				translate(MODEL, -33.5 + aux3 * 1.5f, 0.2f, -10.0f);
+			}
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -425,6 +431,7 @@ void GameManager::renderScene(void) {
 			glBindVertexArray(0);
 
 			popMatrix(MODEL);
+		}
 
 	glutSwapBuffers();
 }
