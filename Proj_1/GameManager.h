@@ -10,6 +10,9 @@
 #include "Butter.h"
 #include "Board.h"
 #include "Car.h"
+#include "Camera.h"
+#include "OrthogonalCamera.h"
+#include "PerspectiveCamera.h"
 #include "GameObject.h"
 #include "Orange.h"
 #include "Track.h"
@@ -41,6 +44,8 @@ private:
 	int _WinX;
 	int _WinY;
 	int _WindowHandle;
+
+	std::vector<Camera*> _cameras; //Camera* _cameras;
 
 public:
     GameManager();
