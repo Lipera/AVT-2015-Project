@@ -3,8 +3,11 @@
 
 //---------------------------------------------variables--------------------------------------------
 
+// Camera
 // Camera Position
 float camX, camY, camZ;
+// Camera Selector
+int camS = 0;
 
 // Camera Spherical Coordinates
 float alpha = 39.0f, beta = 51.0f;
@@ -43,7 +46,7 @@ int _WinX = 640, _WinY = 480;
 // Frame counting and FPS computation
 long myTime,timebase = 0,frame = 0;
 char s[32];
-float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+float lightPos[4] = {0.0f, 20.0f, 0.0f, 1.0f};
 
 Board* board;
 
@@ -51,7 +54,6 @@ Board* board;
 
 GameManager::GameManager(){
     //to do
-	board = new Board();
 
 }
 
@@ -97,7 +99,30 @@ void GameManager::reshape(int w, int h) {
 	// set the projection matrix
 	ratio = (1.0f * w) / h;
 	loadIdentity(PROJECTION);
-	perspective(53.13f, ratio, 0.1f, 1000.0f);
+	
+	if(camS != 0){
+		perspective(53.13f, ratio, 0.1f, 1000.0f);
+	} 
+	else {
+		float right = 20.0f;
+		float left = -20.0f;
+		float top = 20.0f;
+		float bottom = -20.0f;
+		float ratio = (right - left) / (top - bottom);
+		float aspect = (float) glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT);
+
+		if (ratio < aspect) {
+			float delta = ((top - bottom) * aspect - (right - left)) / 2;
+			ortho(left - delta, right + delta, bottom, top, -20.0f, 40.0f);
+		}
+    
+		else {
+			float delta = ((right - left) / aspect - (top - bottom)) / 2;
+			ortho(left, right, bottom - delta, top + delta, -20.0f, 40.0f);
+		}
+
+	}
+	
 }
 
 // -------------------------------------Timer--------------------------------------------
@@ -114,8 +139,7 @@ void GameManager::timer(int value){
 
 // -------------------------------------Refresh--------------------------------------------
 
-void GameManager::refresh(int value)
-{
+void GameManager::refresh(int value){
 	glutPostRedisplay();
 }
 
@@ -123,8 +147,7 @@ void GameManager::refresh(int value)
 // Events from the Keyboard
 //------------------------------------------------------------------------------------------
 
-void GameManager::processKeys(unsigned char key, int xx, int yy)
-{
+void GameManager::processKeys(unsigned char key, int xx, int yy){
 	switch(key) {
 
 		case 27:
@@ -136,6 +159,26 @@ void GameManager::processKeys(unsigned char key, int xx, int yy)
 			break;
 		case 'm': glEnable(GL_MULTISAMPLE); break;
 		case 'n': glDisable(GL_MULTISAMPLE); break;
+
+		//case '1': camS = 0; printf("Orthogonal Camera\n"); _cameras[camS]->computeProjectionMatrix(); break;
+		//case '2': camS = 1; printf("Perspective Camera without mouse\n"); _cameras[camS]->computeProjectionMatrix(); alpha = 180.0; beta =46.0; r = 37.0; break;
+		//case '3': camS = 2; printf("Perspective Camera with mouse\n"); _cameras[camS]->computeProjectionMatrix(); break;
+		case '1':	camS = 0; 
+					r=25.0f; 
+					printf("Orthogonal Camera\n"); 
+					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					break;
+		case '2':	camS = 1; 
+					printf("Perspective Camera without mouse\n"); 
+					camX = 0.0f; 
+					camY = 27.0f; 
+					camZ = 28.0f; 
+					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					break;
+		case '3':	camS = 2; 
+					printf("Perspective Camera with mouse\n"); 
+					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					break;
 	}
 }
 
@@ -145,6 +188,7 @@ void GameManager::processKeys(unsigned char key, int xx, int yy)
 //-----------------------------------------------------------------------------------------
 
 void GameManager::processMouseButtons(int button, int state, int xx, int yy){
+	if(camS == 2){
 	// start tracking the mouse
 	if (state == GLUT_DOWN)  {
 		startX = xx;
@@ -169,12 +213,12 @@ void GameManager::processMouseButtons(int button, int state, int xx, int yy){
 		tracking = 0;
 	}
 }
-
+}
 
 // -------------------------Track mouse motion while buttons are pressed-------------------------
 
 void GameManager::processMouseMotion(int xx, int yy){
-
+	if(camS == 2) {
 	int deltaX, deltaY;
 	float alphaAux, betaAux;
 	float rAux;
@@ -208,13 +252,14 @@ void GameManager::processMouseMotion(int xx, int yy){
 	camX = rAux * sin(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
 	camZ = rAux * cos(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
 	camY = rAux *   						       sin(betaAux * 3.14f / 180.0f);
-
+	}
 //  uncomment this if not using an idle func
 //	glutPostRedisplay();
 }
 
 
 void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
+	if(camS == 2) {
 	//velocidade do zoom
 	r += direction * 0.75f;
 	if (r < 0.1f)
@@ -223,7 +268,7 @@ void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
 	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camY = r *   						     sin(beta * 3.14f / 180.0f);
-
+	}
 //  uncomment this if not using an idle func
 //	glutPostRedisplay();
 }
@@ -243,19 +288,26 @@ void GameManager::renderScene(void) {
 	loadIdentity(VIEW);
 	loadIdentity(MODEL);
 	// set the camera using a function similar to gluLookAt
-	lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
+	//lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
+	//lookAt(0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+
+	if(camS != 0){
+		lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
+	}else{
+		lookAt(0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+	}
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
 	//send the light position in eye coordinates
 		//luz como capacete de mineiro, que acompanha o movimento
-		glUniform4fv(lPos_uniformId, 1, lightPos); //efeito capacete do mineiro, ou seja lighPos foi definido em eye coord 
+		//glUniform4fv(lPos_uniformId, 1, lightPos); //efeito capacete do mineiro, ou seja lighPos foi definido em eye coord 
 
 		//luz esta sempre no mesmo ponto
 
-		//float res[4];
-		//multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so is converted to eye space
-		//glUniform4fv(lPos_uniformId, 1, res);
+		float res[4];
+		multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so is converted to eye space
+		glUniform4fv(lPos_uniformId, 1, res);
 
 	//board---------------------------------------------------------------------------------------
 		
@@ -413,10 +465,10 @@ void GameManager::renderScene(void) {
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
 			if(aux3<=16){
-				translate(MODEL, -11.0 + aux3 * 1.5f, 0.2f, -13.0f);
-			}else {
-				translate(MODEL, -33.5 + aux3 * 1.5f, 0.2f, -10.0f);
-			}
+				translate(MODEL, -11.0f + aux3 * 1.5f, 0.2f, -13.0f);
+			}else if (16 < aux3 && aux3 <= 30) {
+				translate(MODEL, -33.5f + aux3 * 1.5f, 0.2f, -10.0f);
+			} 
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -432,6 +484,139 @@ void GameManager::renderScene(void) {
 
 			popMatrix(MODEL);
 		}
+
+		int aux4;
+		for(aux4=0; aux4 < 30; ++aux4){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux4<=16){
+				translate(MODEL, 13.0f, 0.2f, -11.5f + aux4 * 1.5f);
+			}else if (16 < aux4 && aux4 <= 30) {
+				translate(MODEL, 10.0f, 0.2f, -34.0f + aux4 * 1.5f);
+			} 
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
+
+		int aux5;
+		for(aux5=0; aux5 < 15; ++aux5){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux5<=8){
+				translate(MODEL, 0.5f + aux5 * 1.5f, 0.2f, 14.0f);
+			}else if (8 < aux5 && aux5 <= 14) {
+				translate(MODEL, -11.0f + aux5 * 1.5f, 0.2f, 11.0f);
+			} 
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
+
+		int aux6;
+		for(aux6=0; aux6 < 17; ++aux6){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux6<=9){
+				translate(MODEL, -12.5f, 0.2f, -13.0f + aux6 * 1.5f);
+			}else if (9 < aux6 && aux6 <= 16) {
+				translate(MODEL, -9.25f, 0.2f, -24.75f + aux6 * 1.5f);
+			} 
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
+
+		int aux7;
+		for(aux7=0; aux7 < 24; ++aux7){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux7<=12){
+				translate(MODEL, -12.5f + aux7 * 1.0f, 0.2f, 1.5f + aux7 * 1.0f);
+			}else if (12 < aux7 && aux7 <= 23) {
+				translate(MODEL, -21.5f + aux7 * 1.0f, 0.2f, -12.75f + aux7 * 1.0f);
+			} 
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
+
 
 	glutSwapBuffers();
 }
@@ -509,10 +694,10 @@ void GameManager::init()
 	float diff4[] = {1.0f, 0.8f, 0.1f, 1.0f};
 	float spec4[] = {0.9f, 0.7f, 0.3f, 1.0f};
 
-	//black plastic
-	float amb5[]= {0.0f, 0.0f, 0.0f, 1.0f};
-	float diff5[] = {0.01f, 0.01f, 0.01f, 1.0f};
-	float spec5[] = {0.5f, 0.5f, 0.5f, 1.0f};
+	//cereais
+	float amb5[]= {0.02f, 0.02f, 0.02f, 1.0f};
+	float diff5[] = {0.95f, 0.84f, 0.65f, 1.0f};
+	float spec5[] = {0.71f, 0.66f, 0.73f, 1.0f};
 
 	//criacao do tabuleiro
 
@@ -580,6 +765,6 @@ void GameManager::init()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 1.0f,1.0f, 1.0f);
 
 }
