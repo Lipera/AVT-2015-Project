@@ -18,8 +18,8 @@ private:
 	bool _state;
     
 public:
-	LightSource(GLenum number);
-    ~LightSource();
+  LightSource(GLenum number);
+  ~LightSource();
   void setAmbient(Vector4 ambient);
   void setDiffuse(Vector4 diffuse);
   void setSpecular(Vector4 specular);
@@ -28,10 +28,10 @@ public:
   void setCutOff(double cut_off);
   void setExponent(double exponent);
   GLenum getNum();
-	bool getState();
-	bool setState(bool state);
+  bool getState();
+  bool setState(bool state);
 	
-	void draw();
+  void draw();
 
 };
 
