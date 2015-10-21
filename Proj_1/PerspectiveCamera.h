@@ -14,6 +14,7 @@ public:
     PerspectiveCamera (float fovy, float ratio, float nearp, float farp);
     ~PerspectiveCamera();
 	void computeProjectionMatrix();
+	void setPosition(float x, float y, float z);
 };
 
 #endif

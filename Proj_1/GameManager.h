@@ -44,8 +44,7 @@ private:
 	int _WinX;
 	int _WinY;
 	int _WindowHandle;
-
-	std::vector<Camera*> _cameras; //Camera* _cameras;
+	//std::vector<Camera*> _cameras; Camera* _cameras;
 
 public:
     GameManager();
@@ -57,10 +56,11 @@ public:
 	int getWinX();
 	int getWinY();
 	int getWindowHandle();
-
+	int random(int m);
 	void reshape(int w, int h);
 	void refresh(int value);
 	void processKeys(unsigned char key, int xx, int yy);
+	void processKeysUp(unsigned char key, int xx, int yy);
 	void processMouseButtons(int button, int state, int xx, int yy);
 	void processMouseMotion(int xx, int yy);
 	void mouseWheel(int wheel, int direction, int x, int y);

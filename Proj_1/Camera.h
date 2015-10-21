@@ -8,6 +8,7 @@ public:
     Camera();
     ~Camera();
     virtual void computeProjectionMatrix();
+	virtual void setPosition(float x, float y, float z);
 };
 
 #endif

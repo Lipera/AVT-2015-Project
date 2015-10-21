@@ -17,5 +17,7 @@ void PerspectiveCamera::computeProjectionMatrix(){
     perspective(_fovy, _ratio, _nearp, _farp);
 	loadIdentity(VIEW);
 	loadIdentity(MODEL);
-	lookAt(0.0f, 20.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	lookAt(0.0f, 20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
+
+void PerspectiveCamera::setPosition(float x, float y, float z){}

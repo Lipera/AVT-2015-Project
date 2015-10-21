@@ -20,3 +20,5 @@ void OrthogonalCamera::computeProjectionMatrix(){
 	loadIdentity(MODEL);
 	lookAt(0.0f, 20.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
+
+void OrthogonalCamera::setPosition(float x, float y, float z){}

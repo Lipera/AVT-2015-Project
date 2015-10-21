@@ -8,3 +8,4 @@ Camera::~Camera(){
 }
 
 void Camera::computeProjectionMatrix(){}
+void Camera::setPosition(float x, float y, float z){}

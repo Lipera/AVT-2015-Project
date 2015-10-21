@@ -1,4 +1,4 @@
-//include do GameManager
+ //include do GameManager
 #include "GameManager.h" //the other includes are in GameManager.h
 
 //-----------------------------------Variables---------------------------------
@@ -23,6 +23,10 @@ void processKeys(unsigned char key, int xx, int yy){
 	manager->processKeys(key, xx, yy);
 }
 
+void processKeysUp(unsigned char key, int xx, int yy){
+	manager->processKeysUp(key, xx, yy);
+}
+
 void processMouseButtons(int button, int state, int xx, int yy){
 	manager->processMouseButtons(button, state, xx, yy);
 }
@@ -45,7 +49,7 @@ void init(void){
 
 void timer(int value){
 	manager->timer(value);
-    glutTimerFunc(1000, timer, 0);
+    glutTimerFunc(1000/30, timer, 0);
 }
 
 GLuint setupShaders() {
@@ -84,6 +88,7 @@ int main(int argc, char **argv) {
 
 //	Mouse and Keyboard Callbacks
 	glutKeyboardFunc( processKeys );
+	glutKeyboardUpFunc( processKeysUp );
 	glutMouseFunc( processMouseButtons );
 	glutMotionFunc( processMouseMotion );
 	glutMouseWheelFunc ( mouseWheel ) ;

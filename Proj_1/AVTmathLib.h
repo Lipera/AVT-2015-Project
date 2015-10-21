@@ -121,7 +121,7 @@
 		  * \param nearp,farp distance to the near and far planes
 		*/
 		void ortho(float left, float right, float bottom, float top, 
-						float nearp=-1.0f, float farp=1.0f);
+						float nearp=-1.0f, float farp=10.0f);
 
 		/** Similar to glFrustum
 		  *

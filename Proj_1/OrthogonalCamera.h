@@ -16,6 +16,7 @@ public:
     OrthogonalCamera(float left, float right, float bottom, float top, float near, float far);
     ~OrthogonalCamera();
 	void computeProjectionMatrix();
+	void setPosition(float x, float y, float z);
 };
 
 #endif

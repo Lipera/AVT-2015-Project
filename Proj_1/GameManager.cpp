@@ -3,9 +3,22 @@
 
 //---------------------------------------------variables--------------------------------------------
 
+float orangesPos[3] = {-14.0f, 6.0f, 14.0f};
+
+bool keyO = false, keyP = false, keyQ = false, keyA = false;
+
+int oldTimeSinceStart;
+int time = 0;
+
 // Camera
 // Camera Position
 float camX, camY, camZ;
+float carX = -10.0f, carY = 0.0f, carZ = -11.75f;
+float carAlpha = 0.0;
+float carAlphaVar = 0.0;
+float carVelAct = 0.0f;
+float carVelInc = 0.0f;
+float carVelMax = 0.01f;
 // Camera Selector
 int camS = 0;
 
@@ -48,7 +61,15 @@ long myTime,timebase = 0,frame = 0;
 char s[32];
 float lightPos[4] = {0.0f, 20.0f, 0.0f, 1.0f};
 
-Board* board;
+//Movement variables
+
+//car movement
+float carVec[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+
+//orange Position
+float orangeX = 6.0f, orangeY = 2.0f, orangeZ = 15.5f;
+float orangeVel = 0.005f;
+float orangeVec[4] = {0.0f, 0.0f, -1.0f, 0.0f};
 
 //--------------------------------------Constructor and Destructor--------------------------------------
 
@@ -60,6 +81,12 @@ GameManager::GameManager(){
 GameManager::~GameManager(){
 	//to do
 }
+
+//--------------------------------------aux function-----------------------------------
+
+int GameManager::random(int m) {
+	 return rand()%m;
+ }
 
 // -----------------------------------Gets and Sets-------------------------------------
 void GameManager::setWinX(int WinX){
@@ -135,6 +162,51 @@ void GameManager::timer(int value){
 	glutSetWindow(_WindowHandle);
 	glutSetWindowTitle(s.c_str());
     FrameCount = 0;
+
+	int deltaTime;
+    
+    int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
+    deltaTime = timeSinceStart - oldTimeSinceStart;
+    oldTimeSinceStart = timeSinceStart;
+
+	time += deltaTime;
+	//printf("%i\n",deltaTime);
+	if(orangeVel <= 0.02){
+		orangeVel += 0.00001f;
+	}
+	orangeZ -= (deltaTime * orangeVel);
+	if(orangeZ <= -16.5f){
+		orangeZ= 16.5f;
+		orangeX= orangesPos[random(3)];
+	}
+	
+	carAlpha -= carAlphaVar;
+	if(carAlpha >= 360) {
+		carAlpha = 0.0f;
+	} else if(carAlpha < 0) {
+		carAlpha = 360.0f;
+	}
+
+	if(keyQ && carVelAct < carVelMax) {
+		carVelAct += carVelInc;
+	} else if(keyA && carVelAct > -carVelMax) {
+		carVelAct += carVelInc;
+	} else if(!keyQ && ! keyA){
+		if(carVelInc < 0 && carVelAct > 0) {
+			carVelAct += carVelInc;
+		} else if (carVelInc > 0 && carVelAct < 0) {
+			carVelAct += carVelInc;
+		} else {
+			carVelAct = 0.0f;
+		}
+	}
+	/*if(0 <carVelAct || carVelAct <carVelMax) {
+		carVelAct += carVelInc;
+	}*/
+
+	carX += deltaTime * ( carVelAct * cos(-carAlpha * 3.14f / 180.0f));
+	carZ += deltaTime * ( carVelAct * sin(-carAlpha * 3.14f / 180.0f));
+	
 }
 
 // -------------------------------------Refresh--------------------------------------------
@@ -170,18 +242,72 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 					break;
 		case '2':	camS = 1; 
 					printf("Perspective Camera without mouse\n"); 
-					camX = 0.0f; 
+					camX = -28.0f;
 					camY = 27.0f; 
-					camZ = 28.0f; 
+					camZ = 0.0f;
 					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
 					break;
 		case '3':	camS = 2; 
 					printf("Perspective Camera with mouse\n"); 
 					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
 					break;
+
+		case 'O':
+        case 'o': // mover o carro para a esquerda
+			keyO = true;
+			carAlphaVar = -3.0f;
+            break;
+        case 'P':
+        case 'p': // mover o carro para a direita
+			keyP = true;
+			carAlphaVar = 3.0f;
+            break;
+        case 'Q':
+        case 'q': // mover o carro para cima
+			keyQ = true;
+			carVelInc = 0.00075f;
+            break;
+        case 'A':
+        case 'a': // mover o carro para baixo
+			keyA = true;
+			carVelInc = -0.00075f;
+            break;
 	}
 }
 
+void GameManager::processKeysUp(unsigned char key, int xx, int yy){
+    
+    switch (key) {
+        case 'O':
+        case 'o': 
+			keyO = false;
+			carAlphaVar = 0.0f;
+			if(keyP) {
+				carAlphaVar = 3.0f;
+			}
+            break;
+        case 'P':
+        case 'p':
+            keyP = false;
+			carAlphaVar = 0.0f;
+			if(keyO) {
+				carAlphaVar = -3.0f;
+			}
+            break;
+        case 'Q':
+        case 'q':
+            keyQ = false;
+			carVelInc = -0.0005f;
+            break;
+        case 'A':
+        case 'a':
+            keyA = false;
+			carVelInc = 0.0005f;
+            break;
+        default:
+            break;
+    }
+}
 
 // ----------------------------------------------------------------------------------------
 // Mouse Events
@@ -288,14 +414,15 @@ void GameManager::renderScene(void) {
 	loadIdentity(VIEW);
 	loadIdentity(MODEL);
 	// set the camera using a function similar to gluLookAt
-	//lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
-	//lookAt(0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
-	if(camS != 0){
-		lookAt(camX, camY, camZ, 0,0,0, 0,1,0);
-	}else{
+	if(camS == 0){
 		lookAt(0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+	}else if(camS == 1){
+		lookAt(camX, camY, camZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	}else if(camS == 2){
+		lookAt(camX, camY, camZ, carX, carY, carZ, 0.0, 1.0, 0.0);
 	}
+
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
@@ -362,7 +489,7 @@ void GameManager::renderScene(void) {
 				translate(MODEL, 1.0f, 2.0f, -1.0f);
 			}
 			else{
-				translate(MODEL, 5.0f+aux*1.0f, 2.0f, -5.0f+aux*1.0f);
+				translate(MODEL, orangeX, orangeY, orangeZ);
 			}
 
 			// send matrices to OGL
@@ -449,6 +576,7 @@ void GameManager::renderScene(void) {
 
 			popMatrix(MODEL);
 		}
+
 //track---------------------------------------------------------------------------------------
 			
 		objId=5;
@@ -617,6 +745,155 @@ void GameManager::renderScene(void) {
 			popMatrix(MODEL);
 		}
 
+//car-------------------------------------------------------------------------------------
+		//wheels--------------------------------------------------------------------------
+		objId = 6;
+		int aux8;
+		for(aux8=0; aux8 < 4; ++aux8){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux8==0){
+				translate(MODEL, 0.75f, 0.5f, 0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			}else if (aux8==1) {
+				translate(MODEL, -0.75f, 0.5f, 0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} else if (aux8==2) {
+				translate(MODEL, 0.75f, 0.5f, -0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} else  {
+				translate(MODEL, -0.75f, 0.5f, -0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} 
+			translate(MODEL, 0.0f, 0.35f, 0.0f);
+			translate(MODEL, carX, carZ, carY);
+			//rotate(MODEL, -carAlpha, 1.0, 0.0, 1.0);
+			//translate(MODEL, -10.0f, -11.5f, 0.0f);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
+
+		//base block car---------------------------
+		objId = 7;
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			//translate(MODEL, -10.0f, 0.0f, -11.50f);
+			translate(MODEL, carX, carY, carZ);
+			translate(MODEL, -1.5f, 0.5f, 0.0f);
+			//rotate(MODEL, carAlpha, 0.0, 1.0, 0.0);
+			scale(MODEL, 3.0f, 0.50f, 0.75f);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+
+		//top block car-----------------------------
+		objId = 8;
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			//translate(MODEL, -10.0f, 0.0f, -11.50f);
+			translate(MODEL, carX, carY, carZ);
+			translate(MODEL, -1.0f, 1.0f, 0.0f);
+			scale(MODEL, 1.5f, 0.50f, 0.75f);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		
+			//spindles--------------------------------------------------------------------------
+		objId = 9;
+		int aux9;
+		for(aux9=0; aux9 < 2; ++aux9){
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[objId].mat.shininess);
+			pushMatrix(MODEL);
+			if(aux9==0){
+				translate(MODEL, 0.75f, 0.5f, 0.35f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			}else if (aux9==1) {
+				translate(MODEL, -0.75f, 0.5f, 0.35f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} 
+			//translate(MODEL, -10.0f, -11.5f, 0.0f);
+			translate(MODEL, carX, carZ, carY);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glBindVertexArray(mesh[objId].vao);
+			glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+		}
 
 	glutSwapBuffers();
 }
@@ -694,12 +971,33 @@ void GameManager::init()
 	float diff4[] = {1.0f, 0.8f, 0.1f, 1.0f};
 	float spec4[] = {0.9f, 0.7f, 0.3f, 1.0f};
 
-	//cereais
+	//cereals
 	float amb5[]= {0.02f, 0.02f, 0.02f, 1.0f};
 	float diff5[] = {0.95f, 0.84f, 0.65f, 1.0f};
 	float spec5[] = {0.71f, 0.66f, 0.73f, 1.0f};
 
-	//criacao do tabuleiro
+	//wheels color (black rubber)
+	float amb6[]= {0.02f, 0.02f, 0.02f, 1.0f};
+	float diff6[] = {0.01f, 0.01f, 0.01f, 1.0f};
+	float spec6[] = {0.4f, 0.4f, 0.4f, 1.0f};
+
+	//base block car color (red plastic)
+	float amb7[]= {0.3f, 0.1f, 0.1f, 1.0f};
+	float diff7[] = {0.5f, 0.0f, 0.0f, 1.0f};
+	float spec7[] = {0.7f, 0.6f, 0.6f, 1.0f};
+
+	//top block car color (blue glass)
+	float amb8[]= {0.0f, 0.3f, 0.4f, 1.0f};
+	float diff8[] = {0.07f, 0.68f, 0.89f, 1.0f};
+	float spec8[] = {0.6f, 0.45f, 0.6f, 1.0f};
+
+	//spindles color 
+	float amb9[]= {0.3f, 0.3f, 0.3f, 1.0f};
+	float diff9[] = {0.5f, 0.5f, 0.5f, 1.0f};
+	float spec9[] = {0.55f, 0.55f, 0.55f, 1.0f};
+
+	
+	//ctabuleiro
 
 	//blue cube of board
 		objId=0;
@@ -761,10 +1059,51 @@ void GameManager::init()
 		mesh[objId].mat.texCount = texcount;
 		createTorus(0.1f, 0.5f, 20, 20);
 
+	//car
+		//wheel
+		objId=6;
+		memcpy(mesh[objId].mat.ambient, amb6,4*sizeof(float));
+		memcpy(mesh[objId].mat.diffuse, diff6,4*sizeof(float));
+		memcpy(mesh[objId].mat.specular, spec6,4*sizeof(float));
+		memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+		mesh[objId].mat.shininess = shininess;
+		mesh[objId].mat.texCount = texcount;
+		createTorus(0.1f, 0.5f, 20, 20);
+
+		//base block
+		objId=7;
+		memcpy(mesh[objId].mat.ambient, amb7,4*sizeof(float));
+		memcpy(mesh[objId].mat.diffuse, diff7,4*sizeof(float));
+		memcpy(mesh[objId].mat.specular, spec7,4*sizeof(float));
+		memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+		mesh[objId].mat.shininess = shininess;
+		mesh[objId].mat.texCount = texcount;
+		createCube();
+
+		//top block
+		objId=8;
+		memcpy(mesh[objId].mat.ambient, amb8,4*sizeof(float));
+		memcpy(mesh[objId].mat.diffuse, diff8,4*sizeof(float));
+		memcpy(mesh[objId].mat.specular, spec8,4*sizeof(float));
+		memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+		mesh[objId].mat.shininess = shininess;
+		mesh[objId].mat.texCount = texcount;
+		createCube();
+
+		//spindle
+		objId=9;
+		memcpy(mesh[objId].mat.ambient, amb9,4*sizeof(float));
+		memcpy(mesh[objId].mat.diffuse, diff9,4*sizeof(float));
+		memcpy(mesh[objId].mat.specular, spec9,4*sizeof(float));
+		memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
+		mesh[objId].mat.shininess = shininess;
+		mesh[objId].mat.texCount = texcount;
+		createCylinder(1.25f, 0.1f, 10);
+
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
-	glClearColor(1.0f, 1.0f,1.0f, 1.0f);
+	glClearColor(0.529f, 0.808f,0.922f, 1.0f);
 
 }
