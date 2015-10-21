@@ -1,6 +1,6 @@
-#include LightSource.h
+#include "LightSource.h"
 
-LightSource::LightSource(GLenum number) {
+LightSource::LightSource(/*GLenum number*/) {
 
 }
 
@@ -36,16 +36,15 @@ void LightSource::setExponent(double exponent) {
 
 }
 
-GLenum LightSource::getNum() {
-
-}
+//GLenum LightSource::getNum() {}
 
 bool LightSource::getState() {
-
+	return _state;
 }
 
 bool LightSource::setState(bool state) {
-
+	_state = state;
+    return _state;
 }
 
 void LightSource::draw() {
