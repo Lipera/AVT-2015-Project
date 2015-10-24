@@ -7,11 +7,23 @@ Vector4::Vector4(){
 
 Vector4::Vector4(double x, double y, double z, double w){
 	_w = w;
-    Vector3 (x, y, z);
+    _xyz = new Vector3(x, y, z);
 }
 
 Vector4::~Vector4(){
-	//nothing to do
+	delete _xyz;
+}
+
+double Vector4::getX(){
+	return _xyz->getX();
+}
+
+double Vector4::getY(){
+	return _xyz->getY();
+}
+
+double Vector4::getZ(){
+	return _xyz->getZ();
 }
 
 double Vector4::getW(){
@@ -20,41 +32,38 @@ double Vector4::getW(){
 
 void Vector4::set(double x, double y, double z, double w){
 	_w = w;
-    Vector3::set(x, y, z);
+    _xyz->set(x, y, z);
 }
 
 Vector4* Vector4::operator=(Vector4 &vec){
-	_x = (&vec)->getX();
-    _y = (&vec)->getY();
-    _z = (&vec)->getZ();
-    _w = (&vec)->getW();
-    Vector4* vec_aux = new Vector4(_x, _y, _z, _w);
-    return vec_aux;
+	_xyz->set((&vec)->getX(), (&vec)->getY(), (&vec)->getZ());
+	_w = vec.getW();
+    return this;
 }
 
 Vector4* Vector4::operator*(double num){
-	_x = _x * num;
-    _y = _y * num;
-    _z = _z * num;
-    _w = _w * num;
-    Vector4* vec_aux = new Vector4(_x, _y, _z, _w);
+	double x = _xyz->getX() * num;
+    double y = _xyz->getY() * num;
+    double z = _xyz->getZ() * num;
+    double w = _w * num;
+    Vector4* vec_aux = new Vector4(x, y, z, _w);
     return vec_aux;
 }
 
 Vector4* Vector4::operator+(Vector4 &vec){
-	_x = _x + (&vec)->getX();
-    _y = _y + (&vec)->getY();
-    _z = _z + (&vec)->getZ();
-    _w = _w + (&vec)->getW();
-    Vector4* vec_aux = new Vector4(_x, _y, _z, _w);
+	double x = _xyz->getX() + (&vec)->getX();
+    double y = _xyz->getY() + (&vec)->getY();
+    double z = _xyz->getZ() + (&vec)->getZ();
+    double w = _w + (&vec)->getW();
+    Vector4* vec_aux = new Vector4(x, y, z, _w);
     return vec_aux;
 }
 
 Vector4* Vector4::operator-(Vector4 &vec){
-	_x = _x - (&vec)->getX();
-    _y = _y - (&vec)->getY();
-    _z = _z - (&vec)->getZ();
-    _w = _w - (&vec)->getW();
-    Vector4* vec_aux = new Vector4(_x, _y, _z, _w);
+	double x = _xyz->getX() - (&vec)->getX();
+    double y = _xyz->getY() - (&vec)->getY();
+    double z = _xyz->getZ() - (&vec)->getZ();
+    double w = _w - (&vec)->getW();
+    Vector4* vec_aux = new Vector4(x, y, z, _w);
     return vec_aux;
 }
