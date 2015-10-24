@@ -1,0 +1,1 @@
+Basic_geometry nao levava o #ifndef, fazendo com que ele tentasse sempre redefinir e provocando erros no codigo
