@@ -518,7 +518,7 @@ void GameManager::init(){
 	
 	glGenTextures(4, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
-	TGA_Texture(TextureArray, "checker.tga", 1);
+	TGA_Texture(TextureArray, "blue_checkboard.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
 	TGA_Texture(TextureArray, "orange1.tga", 3);
 
