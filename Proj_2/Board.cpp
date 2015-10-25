@@ -50,8 +50,8 @@ void Board::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 	glUniform1f(loc,mesh[objId].mat.shininess);
 	pushMatrix(MODEL);
-	translate(MODEL, -15.0f, -3.0f, -15.0f);
-	scale(MODEL, 30.0f, 3.0f, 30.0f);
+	translate(MODEL, -15.5f, -3.0f, -15.5f);
+	scale(MODEL, 31.0f, 3.0f, 31.0f);
 
 	// send matrices to OGL
 	computeDerivedMatrix(PROJ_VIEW_MODEL);

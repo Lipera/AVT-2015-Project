@@ -14,9 +14,10 @@
 //#include "OrthogonalCamera.h"
 //#include "PerspectiveCamera.h"
 #include "GameObject.h"
-//#include "Orange.h"
+#include "Orange.h"
 #include "Track.h"
 #include "Table.h"
+#include "Candle.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"

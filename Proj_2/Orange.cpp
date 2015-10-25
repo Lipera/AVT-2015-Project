@@ -1,4 +1,4 @@
-#include "Table.h"
+#include "Orange.h"
 
 /// The storage for matrices
 extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
@@ -7,43 +7,38 @@ extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
 extern float mNormal3x3[9];
 
 //constructor
-Table::Table(){
+Orange::Orange(){
     //to do
 }
 
 //destructor
-Table::~Table(){
+Orange::~Orange(){
     //to do
 }
 
-//desenha mesa
-void Table::create(struct MyMesh* mesh){
+
+void Orange::create(struct MyMesh* mesh){
 
 	float amb[]= {0.2f, 0.15f, 0.1f, 1.0f};
 	float diff[] = {0.8f, 0.6f, 0.4f, 1.0f};
 	float spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
 
-	float amb1[]= {0.3f, 0.0f, 0.0f, 1.0f};
-	float diff1[] = {0.8f, 0.1f, 0.1f, 1.0f};
-	float spec1[] = {0.9f, 0.9f, 0.9f, 1.0f};
-	
-
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 100.0f;
 	int texcount = 0;
 
-	int objId=0;
+	int objId=7;
 	memcpy(mesh[objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[objId].mat.specular, spec,4*sizeof(float));
 	memcpy(mesh[objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[objId].mat.shininess = shininess;
 	mesh[objId].mat.texCount = texcount;
-	createCube();
+	createSphere(0.5f, 20);
 }
 
-void Table::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId){
-	int objId=0;
+void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId){
+	int objId=7;
 	GLint loc;
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -55,8 +50,8 @@ void Table::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, -16.0f, -4.0f, -16.0f);
-			scale(MODEL, 32.0f, 3.0f, 32.0f);
+			//translate(MODEL, -16.0f, 0.0f, -16.0f);
+			//scale(MODEL, 32.0f, 3.0f, 32.0f);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);

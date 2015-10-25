@@ -28,7 +28,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[6];
+struct MyMesh mesh[10];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -73,6 +73,8 @@ Table* table;
 Board* board;
 Butter* butter;
 Track* track;
+Candle* candle;
+Orange* orange;
 
 //--------------------------------------Constructor and Destructor--------------------------------------
 
@@ -86,6 +88,10 @@ GameManager::GameManager(){
 	_gameObject.push_back(butter); //butter = 2
 	track = new Track();
 	_gameObject.push_back(track); //track = 3
+	candle = new Candle;
+	_gameObject.push_back(candle); //candle = 4
+	orange = new Orange;
+	_gameObject.push_back(orange); //orange = 5
 }
 
 GameManager::~GameManager(){
@@ -458,7 +464,7 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc3, 3);
 
 		int auxId;
-		for(auxId=0; auxId<4; auxId++){
+		for(auxId=0; auxId<6; auxId++){
 			objId=auxId;
 			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId);
 		}
@@ -523,7 +529,7 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "orange1.tga", 3);
 
 	int auxId;
-	for(auxId=0; auxId<4; auxId++){
+	for(auxId=0; auxId<6; auxId++){
 		objId=auxId;
 		_gameObject[auxId]->create(mesh);
 	}
