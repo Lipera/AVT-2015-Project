@@ -464,9 +464,9 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc3, 3);
 
 		int auxId;
-		for(auxId=0; auxId<6; auxId++){
-			objId=auxId;
-			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId);
+		objId = 0;
+		for(auxId=0; auxId<6; auxId++, objId++){
+			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
 			
 		glBindTexture(GL_TEXTURE_2D, 0);		
@@ -524,14 +524,14 @@ void GameManager::init(){
 	
 	glGenTextures(4, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
-	TGA_Texture(TextureArray, "blue_checkboard.tga", 1);
+	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
 	TGA_Texture(TextureArray, "orange1.tga", 3);
 
 	int auxId;
-	for(auxId=0; auxId<6; auxId++){
-		objId=auxId;
-		_gameObject[auxId]->create(mesh);
+	objId = 0;
+	for(auxId=0; auxId<6; auxId++, objId++){
+		_gameObject[auxId]->create(mesh, &objId);
 	}
 
 	// some GL settings
