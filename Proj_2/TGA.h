@@ -1,3 +1,6 @@
+#ifndef TGA_H
+#define TGA_H
+
 #define TGA_RGB		2
 #define TGA_A		3
 #define TGA_RLE		10
@@ -20,6 +23,6 @@ tImageTGA *Load_TGA(char *filename);
 
 
 
-
+#endif
 // www.morrowland.com
 // apron@morrowland.com

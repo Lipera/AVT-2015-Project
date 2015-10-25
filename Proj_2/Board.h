@@ -1,7 +1,7 @@
 #include "StaticObject.h"
 
-#ifndef __BOARD_H__
-#define __BOARD_H__
+#ifndef BOARD_H
+#define BOARD_H
 
 
 class Board : public StaticObject {

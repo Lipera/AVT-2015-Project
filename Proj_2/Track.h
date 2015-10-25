@@ -1,7 +1,7 @@
 #include "StaticObject.h"
 
-#ifndef __TRACK_H__
-#define __TRACK_H__
+#ifndef TRACK_H
+#define TRACK_H
 
 class Track : public StaticObject{
     
