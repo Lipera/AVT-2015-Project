@@ -63,7 +63,7 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 				translate(MODEL, -12.0f + aux2 * 1.0f, 0.0f, 5.0f + aux2 * 2.0f);
 				rotate(MODEL, -10.0, 0.0, 1.0, 0.0);
 			}
-			scale(MODEL, 4.0f, 1.5f, 3.0f);
+			scale(MODEL, 2.0f, 0.75f, 1.5f);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);

@@ -28,7 +28,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[10];
+struct MyMesh mesh[12];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -75,11 +75,19 @@ Butter* butter;
 Track* track;
 Candle* candle;
 Orange* orange;
+Car* car;
 
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
     //to do
+	Camera* cam0 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,40.0f);
+	_cameras.push_back(cam0);
+	Camera* cam1 = (Camera*) new PerspectiveCamera(53.13f, 1.0f, 0.1f,1000.0f);
+	_cameras.push_back(cam1);
+	Camera* cam2 = (Camera*) new PerspectiveCamera(53.13f, 1.0f, 0.1f,1000.0f);
+	_cameras.push_back(cam2);
+
 	table = new Table();
 	_gameObject.push_back(table); //table = 0
 	board = new Board();
@@ -92,6 +100,8 @@ GameManager::GameManager(){
 	_gameObject.push_back(candle); //candle = 4
 	orange = new Orange;
 	_gameObject.push_back(orange); //orange = 5
+	car = new Car();
+	_gameObject.push_back(car); // car = 6
 }
 
 GameManager::~GameManager(){
@@ -133,6 +143,9 @@ int GameManager::getWindowHandle(){
 
 void GameManager::reshape(int w, int h) {
 
+	_cameras[camS]->computeVisualizationMatrix(w,h);
+
+	/*
 	float ratio;
 	// Prevent a divide by zero, when window is too short
 	if(h == 0)
@@ -163,9 +176,9 @@ void GameManager::reshape(int w, int h) {
 			float delta = ((right - left) / aspect - (top - bottom)) / 2;
 			ortho(left, right, bottom - delta, top + delta, -20.0f, 40.0f);
 		}
-
-	}
 	
+	}
+	*/
 }
 
 // -------------------------------------Timer--------------------------------------------
@@ -178,7 +191,7 @@ void GameManager::timer(int value){
 	glutSetWindow(_WindowHandle);
 	glutSetWindowTitle(s.c_str());
     FrameCount = 0;
-
+	/*
 	int deltaTime;
     
     int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
@@ -216,13 +229,13 @@ void GameManager::timer(int value){
 			carVelAct = 0.0f;
 		}
 	}
-	/*if(0 <carVelAct || carVelAct <carVelMax) {
-		carVelAct += carVelInc;
-	}*/
+	//if(0 <carVelAct || carVelAct <carVelMax) {
+		//carVelAct += carVelInc;
+	//}
 
 	carX += deltaTime * ( carVelAct * cos(-carAlpha * 3.14f / 180.0f));
 	carZ += deltaTime * ( carVelAct * sin(-carAlpha * 3.14f / 180.0f));
-	
+	*/
 }
 
 // -------------------------------------Refresh--------------------------------------------
@@ -248,9 +261,6 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case 'm': glEnable(GL_MULTISAMPLE); break;
 		case 'n': glDisable(GL_MULTISAMPLE); break;
 
-		//case '1': camS = 0; printf("Orthogonal Camera\n"); _cameras[camS]->computeProjectionMatrix(); break;
-		//case '2': camS = 1; printf("Perspective Camera without mouse\n"); _cameras[camS]->computeProjectionMatrix(); alpha = 180.0; beta =46.0; r = 37.0; break;
-		//case '3': camS = 2; printf("Perspective Camera with mouse\n"); _cameras[camS]->computeProjectionMatrix(); break;
 		case '1':	camS = 0; 
 					r=25.0f; 
 					printf("Orthogonal Camera\n"); 
@@ -465,7 +475,7 @@ void GameManager::renderScene(void) {
 
 		int auxId;
 		objId = 0;
-		for(auxId=0; auxId<6; auxId++, objId++){
+		for(auxId=0; auxId<7; auxId++, objId++){
 			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
 			
@@ -530,7 +540,7 @@ void GameManager::init(){
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<6; auxId++, objId++){
+	for(auxId=0; auxId<7; auxId++, objId++){
 		_gameObject[auxId]->create(mesh, &objId);
 	}
 

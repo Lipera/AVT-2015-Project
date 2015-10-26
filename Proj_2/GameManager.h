@@ -9,10 +9,10 @@
 //includes of files .h from object classes of the game
 #include "Butter.h"
 #include "Board.h"
-//#include "Car.h"
-//#include "Camera.h"
-//#include "OrthogonalCamera.h"
-//#include "PerspectiveCamera.h"
+#include "Car.h"
+#include "Camera.h"
+#include "OrthogonalCamera.h"
+#include "PerspectiveCamera.h"
 #include "GameObject.h"
 #include "Orange.h"
 #include "Track.h"
@@ -34,7 +34,7 @@
 #include <GL/freeglut.h>
 
 //-----------------------------------defines--------------------------------
-#define CAPTION "AVT MultiTexture Demo"
+#define CAPTION "MicroMachine"
 #define FPS 60
 //---------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ private:
 	int _WinY;
 	int _WindowHandle;
 	std::vector<GameObject*> _gameObject;
-	//std::vector<Camera*> _cameras; Camera* _cameras;
+	std::vector<Camera*> _cameras;
 
 public:
     GameManager();

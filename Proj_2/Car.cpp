@@ -1,4 +1,4 @@
-#include "Candle.h"
+#include "Car.h"
 
 /// The storage for matrices
 extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
@@ -8,69 +8,156 @@ extern float mNormal3x3[9];
 
 
 //constructor
-Candle::Candle(){
+Car::Car(){
     //to do
 }
 
 //destructor
-Candle::~Candle(){
+Car::~Car(){
     //to do
 }
 
-void Candle::create (struct MyMesh* mesh, int *objId){
+void Car::create (struct MyMesh* mesh, int *objId){
 
-	float amb[] = { 0.25f, 0.25f, 0.25f, 1.0f };
-	float diff[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	float spec[] = { 0.774597f, 0.774597f, 0.774597f, 1.0f };
+	//wheels color (black rubber)
+	float amb[]= {0.02f, 0.02f, 0.02f, 1.0f};
+	float diff[] = {0.01f, 0.01f, 0.01f, 1.0f};
+	float spec[] = {0.4f, 0.4f, 0.4f, 1.0f};
 
-	//yellow
-	float amb2[]= {0.0f, 0.0f, 0.0f, 1.0f};
-	float diff2[] = {1.0f, 0.8f, 0.1f, 1.0f};
-	float spec2[] = {0.9f, 0.7f, 0.3f, 1.0f};
+	//base block car color (red plastic)
+	float amb1[]= {0.3f, 0.1f, 0.1f, 1.0f};
+	float diff1[] = {0.5f, 0.0f, 0.0f, 1.0f};
+	float spec1[] = {0.7f, 0.6f, 0.6f, 1.0f};
+
+	//top block car color (blue glass)
+	float amb2[]= {0.0f, 0.3f, 0.4f, 1.0f};
+	float diff2[] = {0.07f, 0.68f, 0.89f, 1.0f};
+	float spec2[] = {0.6f, 0.45f, 0.6f, 1.0f};
+
+	//spindles color 
+	float amb3[]= {0.3f, 0.3f, 0.3f, 1.0f};
+	float diff3[] = {0.5f, 0.5f, 0.5f, 1.0f};
+	float spec3[] = {0.55f, 0.55f, 0.55f, 1.0f};
 
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 100.0f;
 	int texcount = 0;
 
-	//vela
-	*objId=4;
+	//parte de baixo do carro
+	*objId=8;
+	memcpy(mesh[*objId].mat.ambient, amb1,4*sizeof(float));
+	memcpy(mesh[*objId].mat.diffuse, diff1,4*sizeof(float));
+	memcpy(mesh[*objId].mat.specular, spec1,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	mesh[*objId].mat.shininess = shininess;
+	mesh[*objId].mat.texCount = texcount;
+	createCube();
+	
+	//parte de cima do carro
+	*objId=9;
+	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
+	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
+	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	mesh[*objId].mat.shininess = shininess;
+	mesh[*objId].mat.texCount = texcount;
+	createCube();
+
+	//eixos
+	*objId=10;
+	memcpy(mesh[*objId].mat.ambient, amb3,4*sizeof(float));
+	memcpy(mesh[*objId].mat.diffuse, diff3,4*sizeof(float));
+	memcpy(mesh[*objId].mat.specular, spec3,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	mesh[*objId].mat.shininess = shininess;
+	mesh[*objId].mat.texCount = texcount;
+	createCylinder(1.25f, 0.1f, 10);
+	
+	//rodas
+	*objId=11;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
-	createCylinder(3.0f, 0.7f, 20);
-	
-	//chama base
-	*objId=5;
-	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
-	mesh[*objId].mat.shininess = shininess;
-	mesh[*objId].mat.texCount = texcount;
-	createSphere(0.125f, 10);
-
-	//chama top
-	*objId=6;
-	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
-	mesh[*objId].mat.shininess = shininess;
-	mesh[*objId].mat.texCount = texcount;
-	createCone(0.50f, 0.125f, 10);
+	createTorus(0.1f, 0.5f, 20, 20);
 	
 }
 
-void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
-
-	*objId=4;
+void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
+	
+	*objId=8;
 	GLint loc;
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[*objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[*objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[*objId].mat.shininess);
+			pushMatrix(MODEL);
+			//translate(MODEL, carX, carY, carZ);
+			translate(MODEL, -1.5f, 0.5f, 0.0f);
+			//rotate(MODEL, carAlpha, 0.0, 1.0, 0.0);
+			scale(MODEL, 3.0f, 0.50f, 0.75f);
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
+			//glUniform1i(texMode_uniformId, 1); // só componente especular
+			//glUniform1i(texMode_uniformId, 2); // multitexturing
+
+			glBindVertexArray(mesh[*objId].vao);
+			glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+	
+	*objId=9;
+			// send the material
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+			glUniform4fv(loc, 1, mesh[*objId].mat.diffuse);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+			glUniform4fv(loc, 1, mesh[*objId].mat.specular);
+			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+			glUniform1f(loc,mesh[*objId].mat.shininess);
+			pushMatrix(MODEL);
+			translate(MODEL, -1.0f, 1.0f, 0.0f);
+			scale(MODEL, 1.5f, 0.50f, 0.75f);
+
+			// send matrices to OGL
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+			// Render mesh
+			glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
+			//glUniform1i(texMode_uniformId, 1); // só componente especular
+			//glUniform1i(texMode_uniformId, 2); // multitexturing
+
+			glBindVertexArray(mesh[*objId].vao);
+			glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			popMatrix(MODEL);
+
+
+	*objId=10;
 	int aux;
-	for(aux=0; aux < 6; aux++){
+	for(aux=0; aux < 2; aux++){
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
@@ -82,19 +169,13 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
 
-			if(aux == 0){
-				translate(MODEL, 8.0f, 1.0f, -3.0f);
-			}else if(aux == 1){
-				translate(MODEL, -7.5f, 1.0f, -8.0f);
-			}else if(aux == 2){
-				translate(MODEL, 8.5f, 1.0f, 9.0f);
-			}else if(aux == 3){
-				translate(MODEL, -4.0f, 1.0f, 2.75f);
-			}else if(aux == 4){
-				translate(MODEL, 2.0f, 1.0f, -8.0f);
-			}else if(aux == 5){
-				translate(MODEL, 3.0f, 1.0f, 9.0f);
-			}
+			if(aux==0){
+				translate(MODEL, 0.75f, 0.5f, 0.35f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			}else if (aux==1) {
+				translate(MODEL, -0.75f, 0.5f, 0.35f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} 
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -115,56 +196,9 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			popMatrix(MODEL);
 	}
 
-	*objId=5;
-	int aux2;
-	for(aux2=0; aux2 < 6; aux2++){
-			// send the material
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
-			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
-			glUniform4fv(loc, 1, mesh[*objId].mat.diffuse);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
-			glUniform4fv(loc, 1, mesh[*objId].mat.specular);
-			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
-			glUniform1f(loc,mesh[*objId].mat.shininess);
-			pushMatrix(MODEL);
-
-			if(aux2 == 0){
-				translate(MODEL, 8.0f, 2.70f, -3.0f);
-			}else if(aux2 == 1){
-				translate(MODEL, -7.5f, 2.70f, -8.0f);
-			}else if(aux2 == 2){
-				translate(MODEL, 8.5f, 2.70f, 9.0f);
-			}else if(aux2 == 3){
-				translate(MODEL, -4.0f, 2.70f, 2.75f);
-			}else if(aux2 == 4){
-				translate(MODEL, 2.0f, 2.700f, -8.0f);
-			}else if(aux2 == 5){
-				translate(MODEL, 3.0f, 2.70f, 9.0f);
-			}
-
-			// send matrices to OGL
-			computeDerivedMatrix(PROJ_VIEW_MODEL);
-			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
-			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
-			computeNormalMatrix3x3();
-			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
-
-			// Render mesh
-			glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
-			//glUniform1i(texMode_uniformId, 1); // só componente especular
-			//glUniform1i(texMode_uniformId, 2); // multitexturing
-
-			glBindVertexArray(mesh[*objId].vao);
-			glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-
-			popMatrix(MODEL);
-	}
-
-	*objId=6;
+	*objId=11;
 	int aux3;
-	for(aux3=0; aux3 < 6; aux3++){
+	for(aux3=0; aux3 < 4; aux3++){
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
@@ -175,20 +209,20 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
-
-			if(aux3 == 0){
-				translate(MODEL, 8.0f, 2.70f, -3.0f);
-			}else if(aux3 == 1){
-				translate(MODEL, -7.5f, 2.70f, -8.0f);
-			}else if(aux3 == 2){
-				translate(MODEL, 8.5f, 2.70f, 9.0f);
-			}else if(aux3 == 3){
-				translate(MODEL, -4.0f, 2.70f, 2.75f);
-			}else if(aux3 == 4){
-				translate(MODEL, 2.0f, 2.70f, -8.0f);
-			}else if(aux3 == 5){
-				translate(MODEL, 3.0f, 2.70f, 9.0f);
-			}
+			if(aux3==0){
+				translate(MODEL, 0.75f, 0.5f, 0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			}else if (aux3==1) {
+				translate(MODEL, -0.75f, 0.5f, 0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} else if (aux3==2) {
+				translate(MODEL, 0.75f, 0.5f, -0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} else  {
+				translate(MODEL, -0.75f, 0.5f, -0.5f);
+				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
+			} 
+			translate(MODEL, 0.0f, 0.35f, 0.0f);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -208,6 +242,5 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 
 			popMatrix(MODEL);
 	}
-
 
 }

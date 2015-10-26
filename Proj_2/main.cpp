@@ -48,7 +48,7 @@ void init(void){
 
 void timer(int value){
 	manager->timer(value);
-    glutTimerFunc(1000/30, timer, 0);
+    glutTimerFunc(1000/60, timer, 0);
 }
 
 GLuint setupShaders() {

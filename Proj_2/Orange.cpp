@@ -19,12 +19,12 @@ Orange::~Orange(){
 
 void Orange::create(struct MyMesh* mesh, int *objId){
 
-	float amb[]= {0.2f, 0.15f, 0.1f, 1.0f};
-	float diff[] = {0.8f, 0.6f, 0.4f, 1.0f};
-	float spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
+	float amb[]= {0.2f, 0.2f, 0.2f, 1.0f};
+	float diff[] = {1.0f, 0.43f, 0.09f, 1.0f};
+	float spec[] = {0.633f, 0.728f, 0.633f, 1.0f};
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	float shininess= 100.0f;
+	float shininess= 50.0f;
 	int texcount = 0;
 
 	*objId=7;
@@ -34,7 +34,7 @@ void Orange::create(struct MyMesh* mesh, int *objId){
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
-	createSphere(0.5f, 20);
+	createSphere(1.25f, 20);
 }
 
 void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
@@ -50,8 +50,8 @@ void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
-			//translate(MODEL, -16.0f, 0.0f, -16.0f);
-			//scale(MODEL, 32.0f, 3.0f, 32.0f);
+			translate(MODEL, 3.0f, 1.25f, -3.0f);
+			//translate(MODEL, orangeX, orangeY, orangeZ);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
