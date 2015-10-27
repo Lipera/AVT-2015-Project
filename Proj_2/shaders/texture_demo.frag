@@ -6,6 +6,10 @@ uniform sampler2D texmap2;
 uniform sampler2D texmap3;
 uniform sampler2D texmap4;
 uniform sampler2D texmap5;
+uniform sampler2D texmap6;
+uniform sampler2D texmap7;
+uniform sampler2D texmap8;
+uniform sampler2D texmap9;
 
 uniform int texMode;
 out vec4 colorOut;
@@ -89,6 +93,21 @@ void main() {
 	else if(texMode == 5) // modulate diffuse color with texel color
 	{
 		texel = texture(texmap5, DataIn.tex_coord);  // texel from pause.tga
+		colorOut = texel;
+	}
+	else if(texMode == 6) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap6, DataIn.tex_coord);  // texel from manteiga.tga
+		colorOut = texel;
+	}
+	else if(texMode == 7) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap7, DataIn.tex_coord);  // texel from cheerio.tga
+		colorOut = texel;
+	}
+	else if(texMode == 8) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap8, DataIn.tex_coord);  // texel from cheerio.tga
 		colorOut = texel;
 	}
 

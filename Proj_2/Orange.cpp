@@ -10,6 +10,7 @@ extern float mNormal3x3[9];
 Orange::Orange(float x, float y, float z){
     _position = new Vector3(x, y, z);
     _speed = new Vector3();
+	setAngle(0);
 }
 
 //destructor
@@ -51,9 +52,10 @@ void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
+			
 			translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			//translate(MODEL, orangeX, orangeY, orangeZ);
-
+			//rotate(MODEL, _angle, 0.0f, 1.0f, 0.0f);
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -73,14 +75,17 @@ void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			popMatrix(MODEL);
 }
 
+
 void Orange::update(int delta_t){
 
 	float orangesPos[3] = {-14.0f, 6.0f, 14.0f};
 	float new_x;
     float new_y;
     float new_z;
-
 	float z_speed; 
+	int angle;
+
+	angle = _angle;
 
     new_x = _position->getX();
     new_y = _position->getY();
@@ -92,7 +97,17 @@ void Orange::update(int delta_t){
 		z_speed += 0.00001f;
 		setSpeed(_speed->getX(), _speed->getY(), z_speed);
 	}
-
+	angle = angle + 5;
+			setAngle(angle);
+	/*if (angle <360){
+			angle = angle + 5;
+			setAngle(angle);
+	}
+	if (angle >=360) {
+		angle= 0;
+		setAngle(0);
+	}
+	*/
 	new_z -= (delta_t * z_speed);
 	if(new_z <= -16.5f){
 		new_z= 16.5f;
@@ -103,3 +118,5 @@ void Orange::update(int delta_t){
     
     setPosition(new_x, new_y, new_z);
 }
+
+

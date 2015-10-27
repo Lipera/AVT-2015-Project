@@ -26,3 +26,4 @@ Vector3* DynamicObject::setSpeed(float x, float y, float z){
 Vector3* DynamicObject::getSpeed(){
     return _speed;
 }
+

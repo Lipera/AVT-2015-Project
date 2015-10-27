@@ -49,7 +49,7 @@ GLint pvm_uniformId;
 GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
-GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5;
+GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9;
 GLint texMode_uniformId;
 
 GLuint TextureArray[10];
@@ -151,6 +151,7 @@ int GameManager::getWinY(){
 int GameManager::getWindowHandle(){
 	return _WindowHandle;
 }
+
 
 // -----------------------------Reshape Callback Function-------------------------------
 
@@ -467,6 +468,19 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[5]);
 
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[6]);
+
+		glActiveTexture(GL_TEXTURE7);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[7]);
+
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[8]);
+		
+		glActiveTexture(GL_TEXTURE9);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[9]);
+
+
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
 		glUniform1i(tex_loc1, 1); 
@@ -474,12 +488,48 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc3, 3);
 		glUniform1i(tex_loc4, 4);
 		glUniform1i(tex_loc5, 5);
+		glUniform1i(tex_loc6, 6);
+		glUniform1i(tex_loc7, 7);
+		glUniform1i(tex_loc8, 8);
+		glUniform1i(tex_loc9, 9);
 
 		int auxId;
 		objId = 0;
 		for(auxId=0; auxId<7; auxId++, objId++){
+			//rotacao laranja
+			if (auxId == 5){
+				pushMatrix(MODEL);
+				//translate(MODEL, _gameObject[auxId]->getPosition()->getX(), _gameObject[auxId]->getPosition()->getY(), _gameObject[auxId]->getPosition()->getZ());
+				//rotate(MODEL, _gameObject[auxId]->getAngle(), 0.0f, 1.0f, 0.0f);
+				//rotate(MODEL, _gameObject[auxId]->getAngle(), 0.0f, 1.0f, 0.0f);
+				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+				computeDerivedMatrix(PROJ_VIEW_MODEL);
+				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+				glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+				computeNormalMatrix3x3();
+				glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+	            popMatrix(MODEL);
+
+			}
+			//movimento do carro
+			else if (auxId == 6){
+				pushMatrix(MODEL);
+				translate(MODEL, _gameObject[auxId]->getPosition()->getX(), _gameObject[auxId]->getPosition()->getY(), _gameObject[auxId]->getPosition()->getZ());
+				//rotate(MODEL, _gameObject[auxId]->getAngle(), 0.0f, 1.0f, 0.0f);
+				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+				computeDerivedMatrix(PROJ_VIEW_MODEL);
+				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+				glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+				computeNormalMatrix3x3();
+				glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+	            popMatrix(MODEL);
+
+			}else {
+
 			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			}
 		}
+
 
 
 //Select orthogonal camera and draw frogs(lives) left
@@ -548,6 +598,10 @@ GLuint GameManager::setupShaders() {
 	tex_loc3 = glGetUniformLocation(shader.getProgramIndex(), "texmap3");
 	tex_loc4 = glGetUniformLocation(shader.getProgramIndex(), "texmap4");
 	tex_loc5 = glGetUniformLocation(shader.getProgramIndex(), "texmap5");
+	tex_loc6 = glGetUniformLocation(shader.getProgramIndex(), "texmap6");
+	tex_loc7 = glGetUniformLocation(shader.getProgramIndex(), "texmap7");
+	tex_loc8 = glGetUniformLocation(shader.getProgramIndex(), "texmap8");
+	tex_loc9 = glGetUniformLocation(shader.getProgramIndex(), "texmap9");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -569,13 +623,17 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(6, TextureArray);
+	glGenTextures(10, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
-	TGA_Texture(TextureArray, "orange1.tga", 3);
+	TGA_Texture(TextureArray, "orange.tga", 3);
 	TGA_Texture(TextureArray, "gameover.tga", 4);
 	TGA_Texture(TextureArray, "pause.tga", 5);
+	TGA_Texture(TextureArray, "manteiga.tga", 6);
+	TGA_Texture(TextureArray, "cheerio.tga", 7);
+	TGA_Texture(TextureArray, "candle.tga", 8);
+	TGA_Texture(TextureArray, "candle.tga", 9);
 
 	int auxId;
 	objId = 0;

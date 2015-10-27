@@ -40,6 +40,15 @@ void Car::create (struct MyMesh* mesh, int *objId){
 	float diff3[] = {0.5f, 0.5f, 0.5f, 1.0f};
 	float spec3[] = {0.55f, 0.55f, 0.55f, 1.0f};
 
+	//yellow front lights
+	float amb4[]= {0.0f, 0.0f, 0.0f, 1.0f};
+	float diff4[] = {1.0f, 0.8f, 0.1f, 1.0f};
+	float spec4[] = {0.9f, 0.7f, 0.3f, 1.0f};
+
+	//orange back lights
+	float amb5[]= {0.2f, 0.2f, 0.2f, 1.0f};
+	float diff5[] = {1.0f, 0.43f, 0.09f, 1.0f};
+	float spec5[] = {0.633f, 0.728f, 0.633f, 1.0f};
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 100.0f;
@@ -246,6 +255,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			popMatrix(MODEL);
 	}
 
+
 }
 
 void Car::update(int delta_t){
@@ -263,18 +273,30 @@ void Car::update(int delta_t){
 	
 	z_speed = _speed->getZ();
 
-	if(z_speed <= 0.02){
-		z_speed += 0.00001f;
-		setSpeed(_speed->getX(), _speed->getY(), z_speed);
+	/*carAlpha -= carAlphaVar;
+	if(carAlpha >= 360) {
+		carAlpha = 0.0f;
+	} else if(carAlpha < 0) {
+		carAlpha = 360.0f;
 	}
 
-	new_z -= (delta_t * z_speed);
-	if(new_z <= -16.5f){
-		new_z= 16.5f;
-		new_x= orangesPos[(rand()%3)];
+	if(keyQ && carVelAct < carVelMax) {
+		carVelAct += carVelInc;
+	} else if(keyA && carVelAct > -carVelMax) {
+		carVelAct += carVelInc;
+	} else if(!keyQ && ! keyA){
+		if(carVelInc < 0 && carVelAct > 0) {
+			carVelAct += carVelInc;
+		} else if (carVelInc > 0 && carVelAct < 0) {
+			carVelAct += carVelInc;
+		} else {
+			carVelAct = 0.0f;
+		}
 	}
-    
-    new_z -= _speed->getZ() * delta_t; 
-    
-    setPosition(new_x, new_y, new_z);
+	//if(0 <carVelAct || carVelAct <carVelMax) {
+		//carVelAct += carVelInc;
+	//}
+
+	carX += deltaTime * ( carVelAct * cos(-carAlpha * 3.14f / 180.0f));
+	carZ += deltaTime * ( carVelAct * sin(-carAlpha * 3.14f / 180.0f));*/
 }

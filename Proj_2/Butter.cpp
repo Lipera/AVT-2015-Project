@@ -73,9 +73,7 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 			// Render mesh
-			glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
-			//glUniform1i(texMode_uniformId, 1); // só componente especular
-			//glUniform1i(texMode_uniformId, 2); // multitexturing
+			glUniform1i(texMode_uniformId, 6); // apenas o texel
 
 			glBindVertexArray(mesh[*objId].vao);
 			glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);

@@ -18,3 +18,10 @@ void GameObject::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifo
     //nothing to do
 }
 
+void GameObject::setAngle(int angle){
+	_angle = angle;
+}
+int GameObject::getAngle(){
+	return _angle;
+}
+

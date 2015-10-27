@@ -57,6 +57,7 @@ public:
     GameManager();
     ~GameManager();
 
+	void renderSpacedBitmapString(float x, float y, int spacing, void *font, char *string);
 	void setWinX(int WinX);
 	void setWinY(int WinY);
 	void setWindowHandle(int WindowHandle);

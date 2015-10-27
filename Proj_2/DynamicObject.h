@@ -8,6 +8,7 @@ class DynamicObject : public GameObject {
 
 protected:
     Vector3* _speed;
+	int _angle;
 
 public:
     DynamicObject();
