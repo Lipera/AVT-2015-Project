@@ -65,7 +65,8 @@ float r = 10.0f;
 // Frame counting and FPS computation
 long myTime,timebase = 0,frame = 0;
 char s[32];
-float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+//float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+float lightPos[4] = {8.0f, 2.70f, -3.0f, 1.0f};
 
 //orange Position
 float orangeX = 6.0f, orangeY = 2.0f, orangeZ = 15.5f;
