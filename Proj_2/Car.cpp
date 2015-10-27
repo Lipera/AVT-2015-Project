@@ -8,8 +8,9 @@ extern float mNormal3x3[9];
 
 
 //constructor
-Car::Car(){
-    //to do
+Car::Car(float x, float y, float z){
+    _position = new Vector3(x, y, z);
+    _speed = new Vector3();
 }
 
 //destructor
@@ -104,6 +105,8 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			translate(MODEL, -1.5f, 0.5f, 0.0f);
 			//rotate(MODEL, carAlpha, 0.0, 1.0, 0.0);
 			scale(MODEL, 3.0f, 0.50f, 0.75f);
+
+			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -135,7 +138,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			pushMatrix(MODEL);
 			translate(MODEL, -1.0f, 1.0f, 0.0f);
 			scale(MODEL, 1.5f, 0.50f, 0.75f);
-
+			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -176,7 +179,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 				translate(MODEL, -0.75f, 0.5f, 0.35f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} 
-
+			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -223,7 +226,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} 
 			translate(MODEL, 0.0f, 0.35f, 0.0f);
-
+			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -243,4 +246,35 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			popMatrix(MODEL);
 	}
 
+}
+
+void Car::update(int delta_t){
+
+	float orangesPos[3] = {-14.0f, 6.0f, 14.0f};
+	float new_x;
+    float new_y;
+    float new_z;
+
+	float z_speed; 
+
+    new_x = _position->getX();
+    new_y = _position->getY();
+    new_z = _position->getZ();
+	
+	z_speed = _speed->getZ();
+
+	if(z_speed <= 0.02){
+		z_speed += 0.00001f;
+		setSpeed(_speed->getX(), _speed->getY(), z_speed);
+	}
+
+	new_z -= (delta_t * z_speed);
+	if(new_z <= -16.5f){
+		new_z= 16.5f;
+		new_x= orangesPos[(rand()%3)];
+	}
+    
+    new_z -= _speed->getZ() * delta_t; 
+    
+    setPosition(new_x, new_y, new_z);
 }

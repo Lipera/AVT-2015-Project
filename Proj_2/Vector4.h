@@ -7,19 +7,19 @@ class Vector4 {
 
 private:
 	Vector3 *_xyz;
-	double _w;
+	float _w;
     
 public:
     Vector4();
-	Vector4(double x, double y, double z, double w);
+	Vector4(float x, float y, float z, float w);
     ~Vector4();
-	double getX();
-	double getY();
-	double getZ();
-	double getW();
-	void set(double x, double y, double z, double w);
+	float getX();
+	float getY();
+	float getZ();
+	float getW();
+	void set(float x, float y, float z, float w);
     Vector4* operator=(Vector4 &vec);
-	Vector4* operator*(double num);
+	Vector4* operator*(float num);
 	Vector4* operator+(Vector4 &vec);
 	Vector4* operator-(Vector4 &vec);
 

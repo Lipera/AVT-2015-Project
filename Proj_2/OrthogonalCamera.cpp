@@ -20,21 +20,25 @@ void OrthogonalCamera::computeProjectionMatrix(){
 }
 
 void OrthogonalCamera::computeVisualizationMatrix(int w, int h){
-	if(h == 0)
+	if(h == 0){
 		h = 1;
+	}
+	glViewport(0, 0, w, h);
 	loadIdentity(PROJECTION);
 	float ratio = (_right - _left) / (_top - _bottom);
-		float aspect = (1.0f * w) / h;
+	float aspect = (1.0f * w) / h;
+	
 
-		if (ratio < aspect) {
-			float delta = ((_top - _bottom) * aspect - (_right - _left)) / 2;
-			ortho(_left - delta, _right + delta, _bottom, _top, _near, _far);
-		}
+	if (ratio < aspect) {
+		float delta = ((_top - _bottom) * aspect - (_right - _left)) / 2;			
+		ortho(_left - delta, _right + delta, _bottom, _top, _near, _far);
+	}
     
-		else {
-			float delta = ((_right - _left) / aspect - (_top - _bottom)) / 2;
-			ortho(_left, _right, _bottom - delta, _top + delta, -20.0f, 40.0f);
-		}
+	else {
+		float delta = ((_right - _left) / aspect - (_top - _bottom)) / 2;
+		ortho(_left, _right, _bottom - delta, _top + delta, _near, _far);
+	}
+
 }
 
 void OrthogonalCamera::setPosition(float x, float y, float z){}

@@ -1,13 +1,18 @@
 #include "GameManager.h"
 
 //---------------------------------------------variables--------------------------------------------
+#define INITIAL_LIVES 5
 
-float orangesPos[3] = {-14.0f, 6.0f, 14.0f};
+int n_lives = INITIAL_LIVES;
 
 bool keyO = false, keyP = false, keyQ = false, keyA = false;
 
 int oldTimeSinceStart;
 int time = 0;
+
+bool play = true;
+bool restart = false;
+bool gameOver = false;
 
 // Camera
 // Camera Position
@@ -28,7 +33,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[12];
+struct MyMesh mesh[15];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -44,10 +49,10 @@ GLint pvm_uniformId;
 GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
-GLint tex_loc, tex_loc1, tex_loc2, tex_loc3;
+GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5;
 GLint texMode_uniformId;
 
-GLuint TextureArray[3];
+GLuint TextureArray[10];
 
 
 // Mouse Tracking Variables
@@ -64,8 +69,6 @@ float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 
 //orange Position
 float orangeX = 6.0f, orangeY = 2.0f, orangeZ = 15.5f;
-float orangeVel = 0.005f;
-float orangeVec[4] = {0.0f, 0.0f, -1.0f, 0.0f};
 
 //------------------create object class---------------------
 
@@ -76,6 +79,8 @@ Track* track;
 Candle* candle;
 Orange* orange;
 Car* car;
+GameOver* over;
+Pause* pause;
 
 //--------------------------------------Constructor and Destructor--------------------------------------
 
@@ -87,6 +92,8 @@ GameManager::GameManager(){
 	_cameras.push_back(cam1);
 	Camera* cam2 = (Camera*) new PerspectiveCamera(53.13f, 1.0f, 0.1f,1000.0f);
 	_cameras.push_back(cam2);
+	Camera* cam3 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,100.0f);
+	_cameras.push_back(cam3);
 
 	table = new Table();
 	_gameObject.push_back(table); //table = 0
@@ -96,23 +103,28 @@ GameManager::GameManager(){
 	_gameObject.push_back(butter); //butter = 2
 	track = new Track();
 	_gameObject.push_back(track); //track = 3
-	candle = new Candle;
+	candle = new Candle();
 	_gameObject.push_back(candle); //candle = 4
-	orange = new Orange;
+	orange = new Orange(orangeX, orangeY, orangeZ);
 	_gameObject.push_back(orange); //orange = 5
-	car = new Car();
+	car = new Car(carX, carY, carZ);
 	_gameObject.push_back(car); // car = 6
+	over = new GameOver();
+	_gameObject.push_back(over); //over = 7
+	pause = new Pause();
+	_gameObject.push_back(pause);// pause = 8
+
+
+	int i;
+	for (i = 0; i < INITIAL_LIVES; i++) {
+		_lives.push_back(new Car(0.0f, 0.0f, 0.0f));
+		((Car *)_lives[i])->setPosition(-20 + (i * 3), 20, 0);
+	}
 }
 
 GameManager::~GameManager(){
 	//to do
 }
-
-//--------------------------------------aux function-----------------------------------
-
-int GameManager::random(int m) {
-	 return rand()%m;
- }
 
 // -----------------------------------Gets and Sets-------------------------------------
 void GameManager::setWinX(int WinX){
@@ -145,40 +157,6 @@ void GameManager::reshape(int w, int h) {
 
 	_cameras[camS]->computeVisualizationMatrix(w,h);
 
-	/*
-	float ratio;
-	// Prevent a divide by zero, when window is too short
-	if(h == 0)
-		h = 1;
-	// set the viewport to be the entire window
-	glViewport(0, 0, w, h);
-	// set the projection matrix
-	ratio = (1.0f * w) / h;
-	loadIdentity(PROJECTION);
-	
-	if(camS != 0){
-		perspective(53.13f, ratio, 0.1f, 1000.0f);
-	} 
-	else {
-		float right = 20.0f;
-		float left = -20.0f;
-		float top = 20.0f;
-		float bottom = -20.0f;
-		float ratio = (right - left) / (top - bottom);
-		float aspect = (float) glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT);
-
-		if (ratio < aspect) {
-			float delta = ((top - bottom) * aspect - (right - left)) / 2;
-			ortho(left - delta, right + delta, bottom, top, -20.0f, 40.0f);
-		}
-    
-		else {
-			float delta = ((right - left) / aspect - (top - bottom)) / 2;
-			ortho(left, right, bottom - delta, top + delta, -20.0f, 40.0f);
-		}
-	
-	}
-	*/
 }
 
 // -------------------------------------Timer--------------------------------------------
@@ -191,7 +169,7 @@ void GameManager::timer(int value){
 	glutSetWindow(_WindowHandle);
 	glutSetWindowTitle(s.c_str());
     FrameCount = 0;
-	/*
+	
 	int deltaTime;
     
     int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
@@ -199,17 +177,10 @@ void GameManager::timer(int value){
     oldTimeSinceStart = timeSinceStart;
 
 	time += deltaTime;
-	//printf("%i\n",deltaTime);
-	if(orangeVel <= 0.02){
-		orangeVel += 0.00001f;
+	if(play){
+		orange->update(deltaTime);
 	}
-	orangeZ -= (deltaTime * orangeVel);
-	if(orangeZ <= -16.5f){
-		orangeZ= 16.5f;
-		orangeX= orangesPos[random(3)];
-	}
-	
-	carAlpha -= carAlphaVar;
+	/*carAlpha -= carAlphaVar;
 	if(carAlpha >= 360) {
 		carAlpha = 0.0f;
 	} else if(carAlpha < 0) {
@@ -236,6 +207,15 @@ void GameManager::timer(int value){
 	carX += deltaTime * ( carVelAct * cos(-carAlpha * 3.14f / 180.0f));
 	carZ += deltaTime * ( carVelAct * sin(-carAlpha * 3.14f / 180.0f));
 	*/
+
+	if (gameOver == true) {
+		//Restart game
+		if (restart == true) {
+			n_lives = INITIAL_LIVES;
+			gameOver = false;
+			restart = false;
+		}
+	}
 }
 
 // -------------------------------------Refresh--------------------------------------------
@@ -260,6 +240,16 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 			break;
 		case 'm': glEnable(GL_MULTISAMPLE); break;
 		case 'n': glDisable(GL_MULTISAMPLE); break;
+
+		case 'S' :
+		case 's': play = !play; break;
+
+		case 'R' :
+		case 'r' : 
+			if (gameOver == true){
+				restart = true;
+            }
+			break;
 
 		case '1':	camS = 0; 
 					r=25.0f; 
@@ -467,20 +457,64 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[2]);
 
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[3]);
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[4]);
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[5]);
+
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
 		glUniform1i(tex_loc1, 1); 
 		glUniform1i(tex_loc2, 2);
 		glUniform1i(tex_loc3, 3);
+		glUniform1i(tex_loc4, 4);
+		glUniform1i(tex_loc5, 5);
 
 		int auxId;
 		objId = 0;
 		for(auxId=0; auxId<7; auxId++, objId++){
 			_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
-			
+
+
+//Select orthogonal camera and draw frogs(lives) left
+
+    glPushMatrix();
+    //glDisable(GL_LIGHTING);
+    _cameras[3]->computeProjectionMatrix();
+    _cameras[3]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+    for (int i = 0; i < n_lives; i++) {
+            pushMatrix(MODEL);
+			translate(MODEL, 18.0f, 0.0f, -17.0f + i * 1.5f);
+            scale(MODEL, 0.65f, 0.65f, 0.65f);
+            _lives[i]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			computeDerivedMatrix(PROJ_VIEW_MODEL);
+			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+			computeNormalMatrix3x3();
+			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+            popMatrix(MODEL);
+    }
+    
+    if (gameOver){
+		objId=12;
+       _gameObject[7]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+    }
+    
+    if (!play){
+		objId=12;
+        _gameObject[8]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+    }
+		
 		glBindTexture(GL_TEXTURE_2D, 0);		
 		glutSwapBuffers();
+
+	//para voltar a repor a camara do jogo
+    _cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 }
 
 // ----------------------------------------------------------------------------------------
@@ -511,6 +545,8 @@ GLuint GameManager::setupShaders() {
 	tex_loc1 = glGetUniformLocation(shader.getProgramIndex(), "texmap1");
 	tex_loc2 = glGetUniformLocation(shader.getProgramIndex(), "texmap2");
 	tex_loc3 = glGetUniformLocation(shader.getProgramIndex(), "texmap3");
+	tex_loc4 = glGetUniformLocation(shader.getProgramIndex(), "texmap4");
+	tex_loc5 = glGetUniformLocation(shader.getProgramIndex(), "texmap5");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -532,17 +568,20 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(4, TextureArray);
+	glGenTextures(6, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
 	TGA_Texture(TextureArray, "orange1.tga", 3);
+	TGA_Texture(TextureArray, "gameover.tga", 4);
+	TGA_Texture(TextureArray, "pause.tga", 5);
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<7; auxId++, objId++){
+	for(auxId=0; auxId<9; auxId++, objId++){
 		_gameObject[auxId]->create(mesh, &objId);
 	}
+
 
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);

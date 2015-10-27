@@ -43,12 +43,15 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	mesh[*objId].mat.texCount = texcount;
 	createCylinder(3.0f, 0.7f, 20);
 	
+
+	float emissive2[] = {1.0f, 1.0f, 1.0f, 1.0f}; 
+
 	//chama base
 	*objId=5;
 	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive2,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
 	createSphere(0.125f, 10);
@@ -58,7 +61,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
-	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive2,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
 	createCone(0.50f, 0.125f, 10);
@@ -104,7 +107,7 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 			// Render mesh
-			glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
+			//glUniform1i(texMode_uniformId, 3); // modulate Phong color with texel color
 			//glUniform1i(texMode_uniformId, 1); // só componente especular
 			//glUniform1i(texMode_uniformId, 2); // multitexturing
 

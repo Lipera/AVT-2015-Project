@@ -4,23 +4,23 @@
 class Vector3 {
 
 protected:
-	double _x;
-	double _y;
-	double _z;
+	float _x;
+	float _y;
+	float _z;
     
 public:
     Vector3();
-	Vector3(double x, double y, double z);
+	Vector3(float x, float y, float z);
     ~Vector3();
-	double getX();
-	double getY();
-	double getZ();
-	void set(double x, double y, double z);
-	void setX(double x);
-	void setY(double y);
-	void setZ(double z);
+	float getX();
+	float getY();
+	float getZ();
+	void set(float x, float y, float z);
+	void setX(float x);
+	void setY(float y);
+	void setZ(float z);
     Vector3* operator=(Vector3 &vec);
-	Vector3* operator*(double num);
+	Vector3* operator*(float num);
 	Vector3* operator+(Vector3 &vec);
 	Vector3* operator-(Vector3 &vec);
 

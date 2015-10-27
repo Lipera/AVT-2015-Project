@@ -18,6 +18,8 @@
 #include "Track.h"
 #include "Table.h"
 #include "Candle.h"
+#include "Pause.h"
+#include "GameOver.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -49,6 +51,7 @@ private:
 	int _WindowHandle;
 	std::vector<GameObject*> _gameObject;
 	std::vector<Camera*> _cameras;
+	std::vector<GameObject*> _lives;
 
 public:
     GameManager();
@@ -60,7 +63,6 @@ public:
 	int getWinX();
 	int getWinY();
 	int getWindowHandle();
-	int random(int m);
 	void reshape(int w, int h);
 	void refresh(int value);
 	void processKeys(unsigned char key, int xx, int yy);
@@ -72,6 +74,9 @@ public:
     void init();
 	void timer(int value);
 	GLuint setupShaders();
+
+	//camara auxiliar
+
 };
 
 #endif

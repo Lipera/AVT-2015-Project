@@ -1,12 +1,8 @@
-
-#include "VSShaderlib.h"
-#include "AVTmathLib.h"
-#include "basic_geometry.h"
-
+#include "Entity.h"
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
-class GameObject {
+class GameObject: public Entity {
 
 public:
     GameObject();

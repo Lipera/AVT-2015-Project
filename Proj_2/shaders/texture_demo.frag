@@ -3,6 +3,9 @@
 uniform sampler2D texmap;
 uniform sampler2D texmap1;
 uniform sampler2D texmap2;
+uniform sampler2D texmap3;
+uniform sampler2D texmap4;
+uniform sampler2D texmap5;
 
 uniform int texMode;
 out vec4 colorOut;
@@ -52,11 +55,27 @@ void main() {
 		texel = texture(texmap2, DataIn.tex_coord);  // texel from stone.tga
 		colorOut = max(intensity*texel + spec, 0.1*texel);
 	}
-	else // multitexturing
+	else if(texMode == 2) // multitexturing
 	{
 		texel = texture(texmap2, DataIn.tex_coord);  // texel from lighwood.tga
 		texel1 = texture(texmap1, DataIn.tex_coord);  // texel from checker.tga
 		colorOut = texel * texel1;
+	}
+	else if(texMode == 3) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap3, DataIn.tex_coord);  // texel from orange1.tga
+		//colorOut = max(intensity*texel + spec, 0.1*texel);
+		colorOut = texel;
+	}
+	else if(texMode == 4) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap4, DataIn.tex_coord);  // texel from gameover.tga
+		colorOut = texel;
+	}
+	else if(texMode == 5) // modulate diffuse color with texel color
+	{
+		texel = texture(texmap5, DataIn.tex_coord);  // texel from pause.tga
+		colorOut = texel;
 	}
 
 //colorOut = max(intensity * mat.diffuse + spec, mat.ambient)* //texture(texmap, DataIn.tex_coord) * texture(texmap1, DataIn.tex_coord);
