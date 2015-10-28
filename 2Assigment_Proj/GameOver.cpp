@@ -1,4 +1,4 @@
-#include "Butter.h"
+#include "GameOver.h"
 
 /// The storage for matrices
 extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
@@ -6,32 +6,28 @@ extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
 /// The normal matrix
 extern float mNormal3x3[9];
 
-
 //constructor
-Butter::Butter(float x, float y, float z){
-    _position = new Vector3(x, y, z);
-    _speed = new Vector3();
-	setAngle(0.0f);
-	_bottomLeft = new Vector3(0.0f, 0.0f, 0.0f);
-	_topRight = new Vector3(2.0f, 0.0f, 1.5f);
+GameOver::GameOver(){
+    _position = new Vector3();
 }
 
 //destructor
-Butter::~Butter(){
+GameOver::~GameOver(){
     //to do
 }
 
-void Butter::create (struct MyMesh* mesh, int *objId){
 
-	float amb[]= {0.0f, 0.0f, 0.0f, 1.0f};
-	float diff[] = {1.0f, 0.8f, 0.1f, 1.0f};
-	float spec[] = {0.9f, 0.7f, 0.3f, 1.0f};
+void GameOver::create(struct MyMesh* mesh, int *objId){
 
-	float emissive[] = {0.50f, 0.50f, 0.50f, 1.0f};
+	float amb[]= {1.0f, 1.0f, 1.0f, 1.0f};
+	float diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float spec[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 50.0f;
 	int texcount = 0;
 
-	*objId=2;
+	*objId=11;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
@@ -39,13 +35,10 @@ void Butter::create (struct MyMesh* mesh, int *objId){
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
 	createCube();
-
-
 }
 
-void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
-
-	*objId=2;
+void GameOver::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
+	*objId=11;
 	GLint loc;
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -57,8 +50,10 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
-			scale(MODEL, 2.0f, 0.75f, 1.5f);
+			translate(MODEL, -7.5f, 0.0f, 15.0f);
+			scale(MODEL, 15.0f, 0.0f, 30.0f);
+			rotate(MODEL, 90.0, 0.0f, 0.0f, 1.0f);
+			rotate(MODEL, 180.0, 1.0f, 0.0f, 0.0f);
 
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -68,16 +63,11 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 			// Render mesh
-			glUniform1i(texMode_uniformId, 6); // apenas o texel
+			glUniform1i(texMode_uniformId, 4); // apenas o texel
 
 			glBindVertexArray(mesh[*objId].vao);
 			glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
 			popMatrix(MODEL);
-
-}
-
-void Butter::update(int delta_t){
-
 }
