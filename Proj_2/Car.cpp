@@ -15,8 +15,8 @@ Car::Car(float x, float y, float z){
 	setVarAngle(0.0f);
 	setAceleracao(0.0f);
 	setVelocidade(0.0f);
-	_bottomLeft = new Vector3(-1.25f, 0.0f, -1.25f);
-	_topRight = new Vector3(1.25f, 0.0f, 1.25f);
+	_bottomLeft = new Vector3(-0.45f, 0.0f, -0.45f);
+	_topRight = new Vector3(0.45f, 0.0f, 0.45f);
 }
 
 //destructor

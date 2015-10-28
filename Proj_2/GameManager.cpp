@@ -17,7 +17,7 @@ bool gameOver = false;
 // Camera
 // Camera Position
 float camX, camY, camZ;
-float carX = -10.0f, carY = 0.0f, carZ = -11.75f;
+float carX = -10.0f, carY = 0.0f, carZ = -12.0f;
 float carAlpha = 0.0;
 float carAlphaVar = 0.0;
 float carVelAct = 0.0f;
@@ -138,7 +138,7 @@ GameManager::GameManager(){
 	int aux5 = 0;
 	for(aux=1; aux < 69; ++aux){
 		if(aux<=9){
-			c = new Cheerios(-11.0f + aux * 2.5f, 0.2f, -13.0f);
+			c = new Cheerios(-11.0f + aux * 2.5f, 0.2f, -13.5f);
 			_track.push_back(c);
 		}else if (9 < aux && aux <= 17) {
 			c = new Cheerios(-33.5f + aux * 2.5f, 0.2f, -10.0f);
@@ -251,40 +251,16 @@ void GameManager::timer(int value){
 		car->updateAux(keyQ, keyA, keyO, keyP, deltaTime);
 
 	}
-	/*carAlpha -= carAlphaVar;
-	if(carAlpha >= 360) {
-		carAlpha = 0.0f;
-	} else if(carAlpha < 0) {
-		carAlpha = 360.0f;
-	}
 
-	if(keyQ && carVelAct < carVelMax) {
-		carVelAct += carVelInc;
-	} else if(keyA && carVelAct > -carVelMax) {
-		carVelAct += carVelInc;
-	} else if(!keyQ && ! keyA){
-		if(carVelInc < 0 && carVelAct > 0) {
-			carVelAct += carVelInc;
-		} else if (carVelInc > 0 && carVelAct < 0) {
-			carVelAct += carVelInc;
-		} else {
-			carVelAct = 0.0f;
-		}
-	}
-	//if(0 <carVelAct || carVelAct <carVelMax) {
-		//carVelAct += carVelInc;
-	//}
-
-	carX += deltaTime * ( carVelAct * cos(-carAlpha * 3.14f / 180.0f));
-	carZ += deltaTime * ( carVelAct * sin(-carAlpha * 3.14f / 180.0f));
-	*/
+//------------------------------------------colisoes--------------------------------------------------------------
 
 	float o1_xmin = car->getPosition()->getX() + car->getbottomLeft()->getX();
 	float o1_xmax = car->getPosition()->getX() + car->gettopRight()->getX();
     float o1_zmin = car->getPosition()->getZ() + car->getbottomLeft()->getZ();
     float o1_zmax = car->getPosition()->getZ() + car->gettopRight()->getZ();
 
-	if(o1_xmin<-16.0f || o1_xmin > 16.0f || o1_zmin<-16.0f || o1_zmin > 16.0f || o1_xmax<-16.0f || o1_xmax > 16.0f || o1_zmax<-16.0f || o1_zmax > 16.0f){
+	//colisao com as margens
+	if(o1_xmin<-16.5f || o1_xmin > 16.5f || o1_zmin<-16.5f || o1_zmin > 16.5f || o1_xmax<-16.5f || o1_xmax > 16.5f || o1_zmax<-16.5f || o1_zmax > 16.5f){
 		car->setPosition(-10.0f, 0.0f, -11.75);
 		n_lives--;
 		if(n_lives < 1) {
@@ -293,6 +269,7 @@ void GameManager::timer(int value){
 		}
 	}
 
+	//colisao com a laranja
 	if(collision(car,orange,car->getPosition(), orange->getPosition())) {
 		car->setPosition(-10.0f, 0.0f, -11.75);
 		n_lives--;
@@ -300,6 +277,24 @@ void GameManager::timer(int value){
 			play = false;
 			gameOver = true;
 		}
+	}
+
+	//colisao com as manteigas
+	for(int i = 2; i<6; i++){
+		if(collision(car,_gameObject[i],car->getPosition(), _gameObject[i]->getPosition())) {
+			car->setVelocidade(0.0f);
+			car->setAceleracao(0.0f);
+			_gameObject[i]->setPosition(_gameObject[i]->getPosition()->getX() + 0.1f, _gameObject[i]->getPosition()->getY(), _gameObject[i]->getPosition()->getZ()+0.1f);
+		}
+	}
+
+	//colisao com os cheerios
+	for(int i = 0; i<68; i++){
+		if(collision(car,_track[i],car->getPosition(), _track[i]->getPosition())) {
+			car->setVelocidade(0.0f);
+			car->setAceleracao(0.0f);
+			_track[i]->setPosition(_track[i]->getPosition()->getX() + 0.1f, _track[i]->getPosition()->getY(), _track[i]->getPosition()->getZ()+0.1f);
+	}
 	}
 
 	if (gameOver == true) {
@@ -607,6 +602,7 @@ void GameManager::renderScene(void) {
 				pushMatrix(MODEL);
 				translate(MODEL, _gameObject[auxId]->getPosition()->getX(), _gameObject[auxId]->getPosition()->getY(), _gameObject[auxId]->getPosition()->getZ());
 				rotate(MODEL, _gameObject[auxId]->getAngle(), 0.0f, 1.0f, 0.0f);
+				scale(MODEL, 0.90, 0.9, 0.9);
 				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 				computeDerivedMatrix(PROJ_VIEW_MODEL);
 				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
