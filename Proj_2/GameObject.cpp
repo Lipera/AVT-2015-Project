@@ -18,10 +18,30 @@ void GameObject::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifo
     //nothing to do
 }
 
-void GameObject::setAngle(int angle){
+void GameObject::setAngle(float angle){
 	_angle = angle;
 }
-int GameObject::getAngle(){
+float GameObject::getAngle(){
 	return _angle;
 }
+
+Vector3* GameObject::setbottomLeft(float x, float y, float z){
+    _bottomLeft->set(x, y, z);
+    return _bottomLeft;
+}
+
+Vector3* GameObject::getbottomLeft(){
+    return _bottomLeft;
+}
+
+Vector3* GameObject::settopRight(float x, float y, float z){
+    _topRight->set(x, y, z);
+    return _bottomLeft;
+}
+
+Vector3* GameObject::gettopRight(){
+    return _topRight;
+}
+
+
 

@@ -41,21 +41,8 @@ void main() {
 	vec3 l = normalize(DataIn.lightDir);
 	vec3 e = normalize(DataIn.eye);
 
-	float att, dist;
-
-	/*--------------------- TEMPORARIO -----------------------*/
-	float constantAtt = 0.2f;
-    float linearAtt = 0.2f;
-	float quadraticAtt = 0.1f;
-	/*--------------------- TEMPORARIO -----------------------*/
-
-	/* compute the distance to the light source to a varying variable*/
-    dist = length(DataIn.lightDir);
-
 	float intensity = max(dot(n,l), 0.0);
 	if (intensity > 0.0) {
-		att = 1.0 / (constantAtt + linearAtt * dist + quadraticAtt * dist * dist);
-
 		vec3 h = normalize(l + e);
 		float intSpec = max(dot(h,n), 0.0);
 		spec = mat.specular * pow(intSpec, mat.shininess);
@@ -65,19 +52,18 @@ void main() {
 	if(texMode == 0) // modulate diffuse color with texel color
 	{
 		texel = texture(texmap2, DataIn.tex_coord);  // texel from lighwood.tga
-		colorOut = max(att * (intensity * mat.diffuse * texel + spec),mat.ambient * texel);
+		colorOut = max(intensity * mat.diffuse * texel + spec,mat.ambient * texel);
 	}
 	else if (texMode == 1) // diffuse color is replaced by texel color, with specular area or ambient (0.1*texel)
 	{
 		texel = texture(texmap2, DataIn.tex_coord);  // texel from stone.tga
-		colorOut = max(att * (intensity*texel + spec), 0.1*texel);
+		colorOut = max(intensity*texel + spec, 0.1*texel);
 	}
 	else if(texMode == 2) // multitexturing
 	{
 		texel = texture(texmap2, DataIn.tex_coord);  // texel from lighwood.tga
 		texel1 = texture(texmap1, DataIn.tex_coord);  // texel from checker.tga
-		//colorOut = texel * texel1;
-		colorOut = max(att * (intensity*texel*texel1 + spec), 0.1*texel*texel1);
+		colorOut = texel * texel1;
 	}
 	else if(texMode == 3) // modulate diffuse color with texel color
 	{

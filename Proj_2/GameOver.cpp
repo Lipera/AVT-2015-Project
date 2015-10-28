@@ -27,7 +27,7 @@ void GameOver::create(struct MyMesh* mesh, int *objId){
 	float shininess= 50.0f;
 	int texcount = 0;
 
-	*objId=12;
+	*objId=11;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
@@ -38,7 +38,7 @@ void GameOver::create(struct MyMesh* mesh, int *objId){
 }
 
 void GameOver::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
-	*objId=12;
+	*objId=11;
 	GLint loc;
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");

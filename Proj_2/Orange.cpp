@@ -10,7 +10,9 @@ extern float mNormal3x3[9];
 Orange::Orange(float x, float y, float z){
     _position = new Vector3(x, y, z);
     _speed = new Vector3();
-	setAngle(0);
+	setAngle(0.0f);
+	_bottomLeft = new Vector3(-1.25f, 0.0f, -1.25f);
+	_topRight = new Vector3(1.25f, 0.0f, 1.25f);
 }
 
 //destructor
@@ -29,7 +31,7 @@ void Orange::create(struct MyMesh* mesh, int *objId){
 	float shininess= 50.0f;
 	int texcount = 0;
 
-	*objId=7;
+	*objId=6;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
@@ -40,7 +42,7 @@ void Orange::create(struct MyMesh* mesh, int *objId){
 }
 
 void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
-	*objId=7;
+	*objId=6;
 	GLint loc;
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -55,7 +57,8 @@ void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			
 			translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			//translate(MODEL, orangeX, orangeY, orangeZ);
-			//rotate(MODEL, _angle, 0.0f, 1.0f, 0.0f);
+			rotate(MODEL, -_angle, 1.0f, 0.0f, 0.0f);
+			//rotate(MODEL, _angle, 1.0f, 1.0f, 0.0f);
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
 			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -83,7 +86,7 @@ void Orange::update(int delta_t){
     float new_y;
     float new_z;
 	float z_speed; 
-	int angle;
+	float angle;
 
 	angle = _angle;
 
@@ -97,17 +100,17 @@ void Orange::update(int delta_t){
 		z_speed += 0.00001f;
 		setSpeed(_speed->getX(), _speed->getY(), z_speed);
 	}
-	angle = angle + 5;
-			setAngle(angle);
-	/*if (angle <360){
-			angle = angle + 5;
-			setAngle(angle);
+
+			
+	if (angle <360.0){
+			angle = angle + 5.0f;
+			_angle = angle;
 	}
-	if (angle >=360) {
-		angle= 0;
-		setAngle(0);
+	else if (angle >=360.0) {
+		angle= 0.0f;
+		_angle = 0.0f;
 	}
-	*/
+	
 	new_z -= (delta_t * z_speed);
 	if(new_z <= -16.5f){
 		new_z= 16.5f;

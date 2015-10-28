@@ -9,7 +9,8 @@ extern float mNormal3x3[9];
 
 //constructor
 Candle::Candle(){
-    //to do
+	_bottomLeft = new Vector3(-0.7f, 0.0f, -0.7f);
+	_topRight = new Vector3(0.7f, 0.0f, 0.7f);
 }
 
 //destructor
@@ -34,7 +35,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	int texcount = 0;
 
 	//vela
-	*objId=4;
+	*objId=3;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
@@ -47,7 +48,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	float emissive2[] = {1.0f, 1.0f, 1.0f, 1.0f}; 
 
 	//chama base
-	*objId=5;
+	*objId=4;
 	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
@@ -57,7 +58,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	createSphere(0.125f, 10);
 
 	//chama top
-	*objId=6;
+	*objId=5;
 	memcpy(mesh[*objId].mat.ambient, amb2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff2,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec2,4*sizeof(float));
@@ -70,7 +71,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 
 void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
 
-	*objId=4;
+	*objId=3;
 	GLint loc;
 	int aux;
 	for(aux=0; aux < 6; aux++){
@@ -118,7 +119,7 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			popMatrix(MODEL);
 	}
 
-	*objId=5;
+	*objId=4;
 	int aux2;
 	for(aux2=0; aux2 < 6; aux2++){
 			// send the material
@@ -165,7 +166,7 @@ void Candle::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			popMatrix(MODEL);
 	}
 
-	*objId=6;
+	*objId=5;
 	int aux3;
 	for(aux3=0; aux3 < 6; aux3++){
 			// send the material

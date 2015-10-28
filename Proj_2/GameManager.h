@@ -15,11 +15,11 @@
 #include "PerspectiveCamera.h"
 #include "GameObject.h"
 #include "Orange.h"
-#include "Track.h"
 #include "Table.h"
 #include "Candle.h"
 #include "Pause.h"
 #include "GameOver.h"
+#include "Cheerios.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -52,6 +52,7 @@ private:
 	std::vector<GameObject*> _gameObject;
 	std::vector<Camera*> _cameras;
 	std::vector<GameObject*> _lives;
+	std::vector<GameObject*> _track;
 
 public:
     GameManager();
@@ -75,7 +76,7 @@ public:
     void init();
 	void timer(int value);
 	GLuint setupShaders();
-
+	bool collision(GameObject *obj1, GameObject *obj2, Vector3 *obj1_position, Vector3 *obj2_position);
 	//camara auxiliar
 
 };

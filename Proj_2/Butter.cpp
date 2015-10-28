@@ -8,8 +8,12 @@ extern float mNormal3x3[9];
 
 
 //constructor
-Butter::Butter(){
-    //to do
+Butter::Butter(float x, float y, float z){
+    _position = new Vector3(x, y, z);
+    _speed = new Vector3();
+	setAngle(0.0f);
+	_bottomLeft = new Vector3(0.0f, 0.0f, 0.0f);
+	_topRight = new Vector3(2.0f, 0.0f, 1.5f);
 }
 
 //destructor
@@ -43,8 +47,6 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 
 	*objId=2;
 	GLint loc;
-		int aux2;
-		for(aux2 = 0; aux2 < 4; ++aux2){
 			// send the material
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
 			glUniform4fv(loc, 1, mesh[*objId].mat.ambient);
@@ -55,14 +57,7 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
-			if(aux2%2==0){
-				translate(MODEL, -5.0f + aux2 * 2.0f, 0.0f, -7.0f + aux2 * 5.0f);
-				rotate(MODEL, 10.0, 0.0, 1.0, 0.0);
-			}
-			else{
-				translate(MODEL, -12.0f + aux2 * 1.0f, 0.0f, 5.0f + aux2 * 2.0f);
-				rotate(MODEL, -10.0, 0.0, 1.0, 0.0);
-			}
+			translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			scale(MODEL, 2.0f, 0.75f, 1.5f);
 
 			// send matrices to OGL
@@ -80,5 +75,9 @@ void Butter::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			glBindVertexArray(0);
 
 			popMatrix(MODEL);
-		}
+
+}
+
+void Butter::update(int delta_t){
+
 }
