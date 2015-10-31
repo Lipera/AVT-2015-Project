@@ -444,7 +444,12 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case 'b': glDisable(GL_MULTISAMPLE); break;
 
 		case 'S' :
-		case 's': play = !play; break;
+		case 's': 
+			if(gameOver == true) {
+				break;
+			}
+			play = !play; 
+			break;
 
 		case 'R' :
 		case 'r' : 
