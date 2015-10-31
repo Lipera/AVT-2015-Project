@@ -14,7 +14,6 @@ in vec4 texCoord;
 out Data {
 	vec3 normal;
 	vec3 eye;
-	vec3 lightDir;
 	vec2 tex_coord;
 } DataOut;
 
@@ -23,7 +22,6 @@ void main () {
 	vec4 pos = m_viewModel * position;
 
 	DataOut.normal = normalize(m_normal * normal.xyz);
-	DataOut.lightDir = vec3(l_pos - pos);
 	DataOut.eye = vec3(-pos);
 	DataOut.tex_coord = texCoord.st;
 

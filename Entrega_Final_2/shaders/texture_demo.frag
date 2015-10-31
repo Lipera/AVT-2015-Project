@@ -44,7 +44,6 @@ uniform Materials mat;
 in Data {
 	vec3 normal;
 	vec3 eye;
-	vec3 lightDir;
 	vec2 tex_coord;
 } DataIn;
 
@@ -159,70 +158,57 @@ vec4 spec = vec4(0.0);
 }
 
 /*
-	vec4 spec = vec4(0.0);
-	vec4 texel, texel1;
+void main() {
+
+	vec3 scatteredLight = vec3(0.0); // or, to a global ambient light
+	vec3 reflectedLight = vec3(0.0);
 
 	vec3 n = normalize(DataIn.normal);
-	vec3 l = normalize(DataIn.lightDir);
 	vec3 e = normalize(DataIn.eye);
 
-	float intensity = max(dot(n,l), 0.0);
-	if (intensity > 0.0) {
-		vec3 h = normalize(l + e);
-		float intSpec = max(dot(h,n), 0.0);
-		spec = mat.specular * pow(intSpec, mat.shininess);
-	}
+	vec4 texel, texel1;
 
-	
-	if(texMode == 0) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap2, DataIn.tex_coord);  // texel from lighwood.tga
-		colorOut = max(intensity * mat.diffuse * texel + spec,mat.ambient * texel);
-	}
-	else if (texMode == 1) // diffuse color is replaced by texel color, with specular area or ambient (0.1*texel)
-	{
-		texel = texture(texmap2, DataIn.tex_coord);  // texel from stone.tga
-		colorOut = max(intensity*texel + spec, 0.1*texel);
-	}
-	else if(texMode == 2) // multitexturing
-	{
-		texel = texture(texmap2, DataIn.tex_coord);  // texel from lighwood.tga
-		texel1 = texture(texmap1, DataIn.tex_coord);  // texel from checker.tga
-		colorOut = texel * texel1;
-	}
-	else if(texMode == 3) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap3, DataIn.tex_coord);  // texel from orange1.tga
-		//colorOut = max(intensity*texel + spec, 0.1*texel);
-		colorOut = texel;
-	}
-	else if(texMode == 4) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap4, DataIn.tex_coord);  // texel from gameover.tga
-		colorOut = texel;
-	}
-	else if(texMode == 5) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap5, DataIn.tex_coord);  // texel from pause.tga
-		colorOut = texel;
-	}
-	else if(texMode == 6) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap6, DataIn.tex_coord);  // texel from manteiga.tga
-		colorOut = texel;
-	}
-	else if(texMode == 7) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap7, DataIn.tex_coord);  // texel from cheerio.tga
-		colorOut = texel;
-	}
-	else if(texMode == 8) // modulate diffuse color with texel color
-	{
-		texel = texture(texmap8, DataIn.tex_coord);  // texel from cheerio.tga
-		colorOut = texel;
-	}
+	// loop over all the lights
+	for (int i = 0; i < MAX_LIGHTS; i++) {
+		if (! lights[i].isEnabled) {
+			continue;
+		}
 
-//colorOut = max(intensity * mat.diffuse + spec, mat.ambient)* //texture(texmap, DataIn.tex_coord) * texture(texmap1, DataIn.tex_coord);
+		vec3 halfVector;
+		vec3 lightDirection = vec3(lights[i].position);
+		float attenuation = 1.0;
 
+		// for local lights, compute per-fragment direction,
+		// halfVector, and attenuation
+		if (lights[i].isLocal) {
+			lightDirection = lightDirection + DataIn.eye;
+			float lightDistance = length(lightDirection);
+			lightDirection = lightDirection / lightDistance;
+
+			attenuation = 1.0 / (lights[i].constantAtt + lights[i].linearAtt * lightDistance + lights[i].quadraticAtt * lightDistance * lightDistance);
+
+			vec3 ld = normalize(lightDirection);
+
+			if (lights[i].isSpot) {
+				vec3 sd = normalize(vec3(-lights[i].spotDirection));
+				float spotCos = dot(ld, sd);
+
+				if (spotCos < lights[i].cutOff) {
+					attenuation = 0.0;
+				}
+
+				else {
+					attenuation *= pow(spotCos, lights[i].spotExponent);
+				}
+			}
+
+			halfVector = normalize(ld + e);
+		}
+
+		else {
+			halfVector = lights[i].lightDir;
+		}
+	}
 }
+
 */
