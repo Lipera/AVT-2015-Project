@@ -49,8 +49,8 @@ in Data {
 	vec2 tex_coord;
 } DataIn;
 
-void main() {
 
+void main() {
 
 vec4 spec = vec4(0.0);
 	vec4 texel, texel1;
@@ -233,52 +233,54 @@ void main() {
         reflectedLight += attenuation * spec;
 	}
 
+	colorOut = mat.emissive;
+
 	//Textures where the light contribution is taken into account
 	if(texMode == 0) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from lighwood.tga
-			colorOut = vec4(max(scatteredLight * mat.diffuse * texel + reflectedLight, vec3(mat.ambient) * texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * mat.diffuse * texel + reflectedLight, vec3(mat.ambient) * texel), mat.diffuse.w);
 		}
 		else if (texMode == 1) // diffuse color is replaced by texel color, with specular area or ambient (0.1*texel)
 		{
 			texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from stone.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		}
 		else if(texMode == 2) // multitexturing
 		{
 			texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from lighwood.tga
 			texel1 = vec3(texture(texmap1, DataIn.tex_coord));  // texel from checker.tga
 			//colorOut = texel * texel1;
-			colorOut = vec4(max(scatteredLight * texel * texel1 + reflectedLight, 0.1*texel*texel1), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel * texel1 + reflectedLight, 0.1*texel*texel1), mat.diffuse.w);
 		}
 		else if(texMode == 3) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap3, DataIn.tex_coord));  // texel from orange1.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 			//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 		}
 		else if(texMode == 6) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap6, DataIn.tex_coord));  // texel from manteiga.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 			//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 		}
 		else if(texMode == 7) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap7, DataIn.tex_coord));  // texel from cheerio.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 			//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 		}
 		else if(texMode == 8) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap8, DataIn.tex_coord));  // texel from candle.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 			//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 		}
 		else if(texMode == 9) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap9, DataIn.tex_coord));  // texel from tree.tga
-			colorOut = vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 			//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 		}
 
