@@ -25,7 +25,9 @@ struct Light {
     float linearAtt;
 	float quadraticAtt;
 	int isEnabled;
+	bool isSpot;
 	float cutOff;
+	float spotExponent;
 	vec4 spotDirection;
 };
 struct Materials {
@@ -185,7 +187,7 @@ void main() {
 
 	// loop over all the lights
 	for (int i = 0; i < MAX_LIGHTS; i++) {
-		if (! lights[i].isEnabled) {
+		if (lights[i].isEnabled == 0) {
 			continue;
 		}
 

@@ -26,10 +26,11 @@ LightSource::LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position,
 	_isEnabled = 0;
 
 	_cut_off = 180;
+	_exponent = 0;
 	_spot_direction = new Vector4(0.0f, 0.0f, 0.0f, -1.0f);
 }
 
-LightSource::LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position, float constantAtt, float linearAtt, float quadraticAtt, float cut_off, Vector4 *spot_direction) {
+LightSource::LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position, float constantAtt, float linearAtt, float quadraticAtt, float cut_off, float spot_exponent, Vector4 *spot_direction) {
 	_diffuse = diffuse;
 	_specular = specular;
 	_position = position;
@@ -39,6 +40,7 @@ LightSource::LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position,
 	_isEnabled = 0;
 
 	_cut_off = cut_off;
+	_exponent = spot_exponent;
 	_spot_direction = spot_direction;
 }
 
@@ -171,8 +173,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[0].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[0].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[0].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[0].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[0].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -192,8 +198,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[1].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[1].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[1].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[1].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[1].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -213,8 +223,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[2].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[2].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[2].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[2].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[2].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -234,8 +248,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[3].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[3].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[3].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[3].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[3].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -255,8 +273,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[4].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[4].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[4].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[4].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[4].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -276,8 +298,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[5].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[5].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[5].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[5].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[5].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -297,8 +323,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[6].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[6].isSpot");
+				glUniform1i(loc, false);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[6].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[6].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[6].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -318,8 +348,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[7].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[7].isSpot");
+				glUniform1i(loc, true);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[7].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[7].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[7].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;
@@ -339,8 +373,12 @@ void LightSource::draw(int index, VSShaderLib& shader) {
 				glUniform1f(loc, _quadraticAtt);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[8].isEnabled");
 				glUniform1i(loc, _isEnabled);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[8].isSpot");
+				glUniform1i(loc, true);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[8].cutOff");
 				glUniform1f(loc, _cut_off);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[8].spotExponent");
+				glUniform1f(loc, _exponent);
 				loc = glGetUniformLocation(shader.getProgramIndex(), "lights[8].spotDirection");
 				glUniform4fv(loc, 1, resSpot);
 				break;

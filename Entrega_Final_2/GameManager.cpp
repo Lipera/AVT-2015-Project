@@ -157,9 +157,9 @@ GameManager::GameManager(){
 	light6->changeState(); //Sunlight starts enabled
 	_lights.push_back(light6);
 	//Car Lights
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45, new Vector4(carX, carY, carZ, 0.0f));
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
 	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45, new Vector4(carX, carY, carZ, 0.0f));
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
 	_lights.push_back(light8);
 
 
@@ -479,7 +479,7 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case 'h' :
 			if(play){
 				for(int j = 0; j < SPOT_LIGHT_NUM; j++) {
-					_lights[SPOT_LIGHT_INDEX]->changeState();
+					_lights[SPOT_LIGHT_INDEX+j]->changeState();
 				}
 			}
 			break;
@@ -674,9 +674,9 @@ void GameManager::renderScene(void) {
 			float auxCarX = _gameObject[8]->getPosition()->getX();
 			float auxCarY = _gameObject[8]->getPosition()->getY();
 			float auxCarZ = _gameObject[8]->getPosition()->getZ();
-			float auxCenterX = auxCarX + (5.0f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
+			float auxCenterX = auxCarX + (5.0f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14f));
 			float auxCenterY = 3.0f;
-			float auxCenterZ = auxCarZ + (5.0f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
+			float auxCenterZ = auxCarZ + (5.0f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14f));
 
 			camX = auxCenterX;
 			camY = auxCenterY;
