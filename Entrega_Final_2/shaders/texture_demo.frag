@@ -159,6 +159,7 @@ vec4 spec = vec4(0.0);
 
 }
 
+
 /*
 void main() {
 
@@ -168,17 +169,18 @@ void main() {
 	vec3 n = normalize(DataIn.normal);
 	vec3 e = normalize(DataIn.eye);
 	vec3 lightDirection;
+	float attenuation;
 
 	vec3 texel, texel1;
 
 	//Textures where the light contribution is not taken into account
-	if(texMode == 4) // modulate diffuse color with texel color
+	if(texMode == 4) // texel color
 	{
 		texel = vec3(texture(texmap4, DataIn.tex_coord));  // texel from gameover.tga
 		colorOut = vec4(texel, mat.diffuse.w);
 		return;
 	}
-	else if(texMode == 5) // modulate diffuse color with texel color
+	else if(texMode == 5) // texel color
 	{
 		texel = vec3(texture(texmap5, DataIn.tex_coord));  // texel from pause.tga
 		colorOut = vec4(texel, mat.diffuse.w);
@@ -193,21 +195,21 @@ void main() {
 
 		if(lights[i].position.w == 0.0) { //Directional light
 			lightDirection = normalize(vec3(lights[i].position));
-			float attenuation = 1.0;
+			attenuation = 1.0;
 		}
 
 		else { //Spotlight or Pointlight
-			lightDirection = lightDirection + DataIn.eye;
-			float lightDistance = length(lightDirection);
-			lightDirection = lightDirection / lightDistance;
+			vec3 ld = vec3(lights[i].position) + DataIn.eye;
+			float lightDistance = length(ld);
+			//lightDirection = lightDirection / lightDistance;
 
 			attenuation = 1.0 / (lights[i].constantAtt + lights[i].linearAtt * lightDistance + lights[i].quadraticAtt * lightDistance * lightDistance);
 
-			vec3 ld = normalize(lightDirection);
+			lightDirection = normalize(ld);
 
 			if (lights[i].isSpot) { //Spotlight
 				vec3 sd = normalize(vec3(-lights[i].spotDirection));
-				float spotCos = max(dot(ld, sd), 0.0);
+				float spotCos = max(dot(lightDirection, sd), 0.0);
 
 				if (spotCos < cos(radians(lights[i].cutOff))) {
 					attenuation = 0.0;
@@ -229,8 +231,8 @@ void main() {
                 spec = vec3(lights[i].specular * pow(intSpec, mat.shininess));
         }
  
-        scatteredLight += attenuation * diff;
-        reflectedLight += attenuation * spec;
+        scatteredLight += attenuation * diff * mat.diffuse;
+        reflectedLight += attenuation * spec * mat.specular;
 	}
 
 	colorOut = mat.emissive;
@@ -239,12 +241,12 @@ void main() {
 	if(texMode == 0) // modulate diffuse color with texel color
 		{
 			texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from lighwood.tga
-			colorOut += vec4(max(scatteredLight * mat.diffuse * texel + reflectedLight, vec3(mat.ambient) * texel), mat.diffuse.w);
+			colorOut += vec4(max(scatteredLight * texel + reflectedLight, vec3(mat.ambient) * texel), mat.diffuse.w);
 		}
 		else if (texMode == 1) // diffuse color is replaced by texel color, with specular area or ambient (0.1*texel)
 		{
 			texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from stone.tga
-			colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+			colorOut += vec4(max((scatteredLight/(mat.diffuse * MAX_LIGHTS)) * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		}
 		else if(texMode == 2) // multitexturing
 		{
@@ -285,5 +287,4 @@ void main() {
 		}
 
 }
-
 */
