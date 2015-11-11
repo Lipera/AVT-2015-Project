@@ -53,7 +53,7 @@ GLint pvm_uniformId;
 GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
-GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9;
+GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
 GLint texMode_uniformId;
 
 GLuint TextureArray[10];
@@ -88,9 +88,15 @@ Pause* pause;
 Butter* butter2;
 Butter* butter3;
 Butter* butter4;
+Cheerios* c;
+Billboard* b;
+Glass* glass;
+Coaster* coaster;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
+	
+
     //to do
 	Camera* cam0 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,40.0f);
 	_cameras.push_back(cam0);
@@ -117,7 +123,7 @@ GameManager::GameManager(){
 	_gameObject.push_back(candle); //candle = 6
 	orange = new Orange(orangeX, orangeY, orangeZ);
 	_gameObject.push_back(orange); //orange = 7
-	car = new Car(carX, carY, carZ);
+	car = new Car(carX, carY, carZ, 0);
 	_gameObject.push_back(car); // car = 8
 	over = new GameOver();
 	_gameObject.push_back(over); //over = 9
@@ -125,16 +131,52 @@ GameManager::GameManager(){
 	_gameObject.push_back(pause);// pause = 10
 	cheerio = new Cheerios(0.0f, 0.0f, 0.0f);
 	_gameObject.push_back(cheerio); //track = 11
+	glass = new Glass();
+	_gameObject.push_back(glass); //glass = 12
+	coaster = new Coaster();
+	_gameObject.push_back(coaster); //glass = 13
 
+	//billboard
+	b = new Billboard();
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
-		_lives.push_back(new Car(0.0f, 0.0f, 0.0f));
+		_lives.push_back(new Car(0.0f, 0.0f, 0.0f, 1));
 		((Car *)_lives[i])->setPosition(-20.0f + (i * 3.0f), 20.0f, 0.0f);
 	}
 
 //--------------------------------------Track------------------------------------
-	Cheerios* c;
+	track();
+
+//--------------------------------------||----------------------------------------
+	//Candle Lights
+	LightSource *light0 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.0f, 2.70f, -3.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light0);
+	LightSource *light1 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-7.5f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light1);
+	LightSource *light2 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.5f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light2);
+	LightSource *light3 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-4.0f, 2.70f, 2.75f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light3);
+	LightSource *light4 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(2.0f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light4);
+	LightSource *light5 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(3.0f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	_lights.push_back(light5);
+
+	//Sun Light
+	LightSource *light6 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(0.0f, 1.0f, 0.0f, 0.0f), 0.01f, 0.01f, 0.001f);
+	light6->changeState(); //Sunlight starts enabled
+	_lights.push_back(light6);
+	//Car Lights
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
+	_lights.push_back(light7);
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
+	_lights.push_back(light8);
+
+
+}
+
+void GameManager::track(){
 	int aux;
 	int aux2 = 0;
 	int aux3 = 0;
@@ -184,35 +226,67 @@ GameManager::GameManager(){
 			aux5++;
 		} 
 	}
+}
 
-//--------------------------------------||----------------------------------------
-	//Candle Lights
-	LightSource *light0 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.0f, 2.70f, -3.0f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light0);
-	LightSource *light1 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-7.5f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light1);
-	LightSource *light2 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.5f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light2);
-	LightSource *light3 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-4.0f, 2.70f, 2.75f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light3);
-	LightSource *light4 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(2.0f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light4);
-	LightSource *light5 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(3.0f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
-	_lights.push_back(light5);
+void GameManager::reorganizeGame(){
 
-	//Sun Light
-	LightSource *light6 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(0.0f, 10.0f, 0.0f, 0.0f), 0.01f, 0.01f, 0.001f);
-	light6->changeState(); //Sunlight starts enabled
-	_lights.push_back(light6);
-	//Car Lights
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45, new Vector4(carX, carY, carZ, 0.0f));
-	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45, new Vector4(carX, carY, carZ, 0.0f));
-	_lights.push_back(light8);
+	//butter
+	butter->setPosition(-5.0f, 0.0f, -7.0f);
+	butter2->setPosition(-3.0f, 0.0f, -2.0f);
+	butter3->setPosition(-9.0f, 0.0f, 11.0f);
+	butter4->setPosition(-11.0f, 0.0f, 7.0f);
 
-
-
-
+	//cheerios
+	int cheerios=0;
+	int aux;
+	int aux2 = 0;
+	int aux3 = 0;
+	int aux4 = 0;
+	int aux5 = 0;
+	for(aux=1; aux < 69; ++aux){
+		if(aux<=9){
+			_track[cheerios]->setPosition(-11.0f + aux * 2.5f, 0.2f, -13.5f);
+			cheerios++;
+		}else if (9 < aux && aux <= 17) {
+			_track[cheerios]->setPosition(-33.5f + aux * 2.5f, 0.2f, -10.0f);
+			cheerios++;
+		}else if(17 < aux && aux<=28){
+			_track[cheerios]->setPosition(13.0f, 0.2f, -11.5f + aux2 * 2.5f);
+			cheerios++;
+			aux2++;
+		}else if (28 < aux && aux <= 36) {
+			_track[cheerios]->setPosition(10.0f, 0.2f, -36.5f + aux2 * 2.5f);
+			cheerios++;
+			aux2++;
+		//direita
+		}else if(36 < aux && aux<=41){
+			_track[cheerios]->setPosition(0.5f + aux3 * 2.5f, 0.2f, 14.0f);
+			cheerios++;
+			aux3++;
+		}else if (41 < aux && aux <= 44) {
+			_track[cheerios]->setPosition(-8.0f + aux3 * 2.5f, 0.2f, 11.0f);
+			cheerios++;
+			aux3++;
+		//baixo
+		}else if(44 < aux && aux <= 50){
+			_track[cheerios]->setPosition(-12.5f, 0.2f, -13.0f + aux4 * 2.5f);
+			cheerios++;
+			aux4++;
+		}else if (50 < aux && aux <= 54) {
+			_track[cheerios]->setPosition(-9.25f, 0.2f, -23.75f + aux4 * 2.5f);
+			cheerios++;
+			aux4++;
+		//diagonal
+		}else if(54 < aux && aux <= 61) {
+			_track[cheerios]->setPosition(-12.5f + aux5 * 1.85f, 0.2f, 1.5f + aux5 * 1.85f);
+			cheerios++;
+			aux5++;
+		}else if (61 < aux && aux <= 68) {
+			_track[cheerios]->setPosition(-21.5f + aux5 * 1.85f, 0.2f, -12.75f + aux5 * 1.85f);
+			cheerios++;
+			aux5++;
+		} 
+	}
 }
 
 GameManager::~GameManager(){
@@ -256,13 +330,6 @@ void GameManager::reshape(int w, int h) {
 // -------------------------------------Timer--------------------------------------------
 
 void GameManager::timer(int value){
-
-	std::ostringstream oss;
-	oss << CAPTION << ": " << FrameCount << " FPS @ (" << _WinX << "x" << _WinY << ")   PONTOS: 0";
-	std::string s = oss.str();
-	glutSetWindow(_WindowHandle);
-	glutSetWindowTitle(s.c_str());
-    FrameCount = 0;
 	
 	int deltaTime;
     
@@ -277,6 +344,15 @@ void GameManager::timer(int value){
 
 	}
 
+	
+	std::ostringstream oss;
+	oss << CAPTION << ": " << (int)(FrameCount/(deltaTime*0.001f)) << " FPS @ (" << _WinX << "x" << _WinY << ")   PONTOS: 0";
+	std::string s = oss.str();
+	glutSetWindow(_WindowHandle);
+	glutSetWindowTitle(s.c_str());
+    FrameCount = 0;
+
+
 //------------------------------------------colisoes--------------------------------------------------------------
 
 	float o1_xmin = car->getPosition()->getX() + car->getbottomLeft()->getX();
@@ -287,6 +363,7 @@ void GameManager::timer(int value){
 	//colisao com as margens
 	if(o1_xmin<-16.5f || o1_xmin > 16.5f || o1_zmin<-16.5f || o1_zmin > 16.5f || o1_xmax<-16.5f || o1_xmax > 16.5f || o1_zmax<-16.5f || o1_zmax > 16.5f){
 		car->setPosition(-10.0f, 0.0f, -11.75);
+		car->setAngle(0.0f);
 		n_lives--;
 		if(n_lives < 1) {
 			play = false;
@@ -297,6 +374,7 @@ void GameManager::timer(int value){
 	//colisao com a laranja
 	if(collision(car,orange,car->getPosition(), orange->getPosition())) {
 		car->setPosition(-10.0f, 0.0f, -11.75);
+		car->setAngle(0.0f);
 		n_lives--;
 		if(n_lives < 1) {
 			play = false;
@@ -306,20 +384,33 @@ void GameManager::timer(int value){
 
 	//colisao com as manteigas
 	for(int i = 2; i<6; i++){
+		Butter* butteraux = (Butter*)_gameObject[i];
+		
 		if(collision(car,_gameObject[i],car->getPosition(), _gameObject[i]->getPosition())) {
+			
+			butteraux->setVelocidade(car->getVelocidade());
+			butteraux->setAngle(car->getAngle());
+
 			car->setVelocidade(0.0f);
 			car->setAceleracao(0.0f);
-			_gameObject[i]->setPosition(_gameObject[i]->getPosition()->getX() + 0.1f, _gameObject[i]->getPosition()->getY(), _gameObject[i]->getPosition()->getZ()+0.1f);
+			
+			//_gameObject[i]->setPosition(_gameObject[i]->getPosition()->getX() + 0.1f, _gameObject[i]->getPosition()->getY(), _gameObject[i]->getPosition()->getZ()+0.1f);
 		}
+		butteraux->update(deltaTime);
 	}
 
 	//colisao com os cheerios
 	for(int i = 0; i<68; i++){
+		Cheerios* cheerioaux = (Cheerios*)_track[i];
+		
 		if(collision(car,_track[i],car->getPosition(), _track[i]->getPosition())) {
+			cheerioaux->setVelocidade(car->getVelocidade());
+			cheerioaux->setAngle(car->getAngle());
 			car->setVelocidade(0.0f);
 			car->setAceleracao(0.0f);
-			_track[i]->setPosition(_track[i]->getPosition()->getX() + 0.1f, _track[i]->getPosition()->getY(), _track[i]->getPosition()->getZ()+0.1f);
-	}
+			//_track[i]->setPosition(_track[i]->getPosition()->getX() + 0.1f, _track[i]->getPosition()->getY(), _track[i]->getPosition()->getZ()+0.1f);
+		}
+		cheerioaux->update(deltaTime);
 	}
 
 	if (gameOver == true) {
@@ -331,6 +422,9 @@ void GameManager::timer(int value){
 			car->setAceleracao(0.0f);
 			car->setVelocidade(0.0f);
 			car->setAngle(0.0f);
+			reorganizeGame();
+			orange->setSpeed(0.0f, 0.0f, 0.0f);
+			orange->setPosition(orangeX,orangeY,orangeZ);
 		}
 	}
 }
@@ -338,6 +432,7 @@ void GameManager::timer(int value){
 // -------------------------------------Refresh--------------------------------------------
 
 void GameManager::refresh(int value){
+
 	glutPostRedisplay();
 }
 
@@ -359,7 +454,13 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case 'b': glDisable(GL_MULTISAMPLE); break;
 
 		case 'S' :
-		case 's': play = !play; break;
+		case 's': 
+			
+			if(gameOver == true) {
+				break;
+			}
+			play = !play; 
+			break;
 
 		case 'R' :
 		case 'r' : 
@@ -371,38 +472,50 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 
 		case 'C' :
 		case 'c' :	//Enables candle lighting
-			for(int i = 0; i < CANDLE_LIGHT_NUM; i++) {
-				_lights[i]->changeState();
+			if(play) {
+				for(int i = 0; i < CANDLE_LIGHT_NUM; i++) {
+					_lights[i]->changeState();
+				}
 			}
 			break;
 
 		case 'N' :
 		case 'n' :
-			_lights[DIRECITONAL_LIGHT_INDEX]->changeState();
+			if(play){
+				_lights[DIRECITONAL_LIGHT_INDEX]->changeState();
+			}
 			break;
 
 		case 'H' :
 		case 'h' :
-			for(int j = 0; j < SPOT_LIGHT_NUM; j++) {
-				_lights[SPOT_LIGHT_INDEX]->changeState();
+			if(play){
+				for(int j = 0; j < SPOT_LIGHT_NUM; j++) {
+					_lights[SPOT_LIGHT_INDEX]->changeState();
+				}
 			}
 			break;
 
-		case '1':	camS = 0; 
-					r=25.0f; 
-					printf("Orthogonal Camera\n"); 
-					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+		case '1':	if(play){
+						camS = 0; 
+						r=25.0f; 
+						printf("Orthogonal Camera\n"); 
+						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					}
 					break;
-		case '2':	camS = 1; 
-					printf("Perspective Camera without mouse\n"); 
-					camX = -28.0f;
-					camY = 27.0f; 
-					camZ = 0.0f;
-					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+		case '2':	if(play){
+						camS = 1; 
+						printf("Perspective Camera without mouse\n"); 
+						camX = -28.0f;
+						camY = 27.0f; 
+						camZ = 0.0f;
+						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					}
 					break;
-		case '3':	camS = 2; 
-					printf("Perspective Camera with mouse\n"); 
-					reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+		case '3':	if(play){
+						camS = 2; 
+						printf("Perspective Camera with mouse\n"); 
+						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					}
 					break;
 
 		case 'O':
@@ -531,6 +644,7 @@ void GameManager::processMouseMotion(int xx, int yy){
 	camX = rAux * sin(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
 	camZ = rAux * cos(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
 	camY = rAux *   						       sin(betaAux * 3.14f / 180.0f);
+
 	}
 //  uncomment this if not using an idle func
 //	glutPostRedisplay();
@@ -547,6 +661,7 @@ void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
 	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
 	camY = r *   						     sin(beta * 3.14f / 180.0f);
+	
 	}
 //  uncomment this if not using an idle func
 //	glutPostRedisplay();
@@ -558,6 +673,7 @@ void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
 
 void GameManager::renderScene(void) {
 
+	
 		FrameCount++;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// load identity matrices
@@ -572,13 +688,13 @@ void GameManager::renderScene(void) {
 			float auxCarX = _gameObject[8]->getPosition()->getX();
 			float auxCarY = _gameObject[8]->getPosition()->getY();
 			float auxCarZ = _gameObject[8]->getPosition()->getZ();
-			float auxCenterX = auxCarX + (5.0f * cos((_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
+			float auxCenterX = auxCarX + (5.0f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
 			float auxCenterY = 3.0f;
-			float auxCenterZ = auxCarZ + (5.0f * sin((_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
+			float auxCenterZ = auxCarZ + (5.0f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
 
-			//camX = auxCenterX;
-			//camY = auxCenterY;
-			//camZ = auxCenterZ;
+			camX = auxCenterX;
+			camY = auxCenterY;
+			camZ = auxCenterZ;
 			lookAt(camX, camY, camZ, auxCarX, auxCarY, auxCarZ, 0.0, 1.0, 0.0);
 		}
 		// use our shader
@@ -669,6 +785,37 @@ void GameManager::renderScene(void) {
 				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			}
 		}
+			
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0);
+		
+		//glass and coaster
+		objId = 13;
+		for(auxId=12; auxId<14; auxId++, objId++){
+			if(auxId==12){
+				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			}else if (auxId==13){
+				glEnable(GL_STENCIL_TEST);
+				glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+				glStencilMask(0xFF); // Write to stencil buffer
+				glDepthMask(GL_FALSE); // Don't write to depth buffer
+				glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+
+				glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+				glStencilMask(0x00); // Don't write anything to stencil buffer
+				glDepthMask(GL_TRUE); // Write to depth buffer
+				glDisable(GL_STENCIL_TEST);
+			}
+		
+		}
+
+		glDisable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
 
 		int cheerioId;
 		for(cheerioId=0; cheerioId<68; cheerioId++){
@@ -676,7 +823,31 @@ void GameManager::renderScene(void) {
 			_track[cheerioId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
 
-//Select orthogonal camera and draw frogs(lives) left
+	//#########################################################################################
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0);
+	glBindTexture(GL_TEXTURE_2D,TextureArray[9]);
+	pushMatrix(MODEL);
+	translate(MODEL, 0.0,0.0, 0.0);
+	b->billboardCheatSphericalBegin();
+	glBegin(GL_QUADS);
+		glTexCoord2f(0,0);glVertex3f(-3.0f, 0.0f, 0.0f);
+		glTexCoord2f(1,0);glVertex3f(3.0f, 0.0f, 0.0f);
+		glTexCoord2f(1,1);glVertex3f(3.0f, 6.0f,  0.0f);
+		glTexCoord2f(0,1);glVertex3f(-3.0f, 6.0f,  0.0f);
+		glEnd();
+	//b->billboardEnd();
+	popMatrix(MODEL);
+
+	glBindTexture(GL_TEXTURE_2D,0);
+	glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+			
+	//#####################################################################################################
+
+//Select orthogonal camera and draw cars(lives) left
 
     glPushMatrix();
     //glDisable(GL_LIGHTING);
@@ -694,7 +865,8 @@ void GameManager::renderScene(void) {
 			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
             popMatrix(MODEL);
     }
-    
+
+
     if (gameOver){
 		objId=11;
        _gameObject[9]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
@@ -708,8 +880,14 @@ void GameManager::renderScene(void) {
 		glBindTexture(GL_TEXTURE_2D, 0);		
 		glutSwapBuffers();
 
+		
+		//renderBitmapString(0.0f,0.0f, "ola");
+
 	//para voltar a repor a camara do jogo
     _cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+
+
 }
 
 // ----------------------------------------------------------------------------------------
@@ -777,11 +955,11 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "manteiga.tga", 6);
 	TGA_Texture(TextureArray, "cheerio.tga", 7);
 	TGA_Texture(TextureArray, "candle.tga", 8);
-	TGA_Texture(TextureArray, "candle.tga", 9);
+	TGA_Texture(TextureArray, "tree.tga", 9);
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<12; auxId++, objId++){
+	for(auxId=0; auxId<14; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);
@@ -789,6 +967,14 @@ void GameManager::init(){
 		_gameObject[auxId]->create(mesh, &objId);
 	}
 
+	tImageTGA *image;
+
+	//glEnable(GL_DEPTH_TEST);
+	image = Load_TGA("tree.tga");
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->size_x, image->size_y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->data);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);

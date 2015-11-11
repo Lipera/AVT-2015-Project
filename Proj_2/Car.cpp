@@ -8,15 +8,16 @@ extern float mNormal3x3[9];
 
 
 //constructor
-Car::Car(float x, float y, float z){
+Car::Car(float x, float y, float z, int lives){
     _position = new Vector3(x, y, z);
     _speed = new Vector3();
 	setAngle(0.0f);
 	setVarAngle(0.0f);
 	setAceleracao(0.0f);
 	setVelocidade(0.0f);
-	_bottomLeft = new Vector3(-0.45f, 0.0f, -0.45f);
-	_topRight = new Vector3(0.45f, 0.0f, 0.45f);
+	_bottomLeft = new Vector3(-0.65f, 0.0f, -0.3f);
+	_topRight = new Vector3(0.9f, 0.0f, 0.9f);
+	setLives(lives);
 }
 
 //destructor
@@ -346,3 +347,6 @@ void Car::setVelocidade(float velocidade){
 float Car::getVelocidade(){
 	return _velocidade;
 }
+
+void Car::setLives(int lives){_lives=lives;}
+int Car::getLives(){return _lives;}

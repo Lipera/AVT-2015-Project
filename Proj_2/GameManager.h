@@ -21,6 +21,9 @@
 #include "GameOver.h"
 #include "Cheerios.h"
 #include "LightSource.h"
+#include "Billboard.h"
+#include "Glass.h"
+#include "Coaster.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -29,6 +32,7 @@
 #include "basic_geometry.h"
 
 #include "TGA.h"
+//#include "Fonts.h"
 
 // include GLEW to access OpenGL 3.3 functions
 #include <GL/glew.h>
@@ -79,7 +83,8 @@ public:
 	void timer(int value);
 	GLuint setupShaders();
 	bool collision(GameObject *obj1, GameObject *obj2, Vector3 *obj1_position, Vector3 *obj2_position);
-	//camara auxiliar
+	void track();
+	void reorganizeGame();
 
 };
 

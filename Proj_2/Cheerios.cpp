@@ -12,6 +12,7 @@ Cheerios::Cheerios(float x, float y, float z){
     _position = new Vector3(x, y, z);
     _speed = new Vector3();
 	setAngle(0.0f);
+	setVelocidade(0.0f);
 	_bottomLeft = new Vector3(-0.5f, 0.0f, -0.5f);
 	_topRight = new Vector3(0.5f, 0.0f, 0.5f);
 }
@@ -77,6 +78,51 @@ void Cheerios::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniform
 }
 
 void Cheerios::update(int delta_t){
+	 
+	float new_x;
+    float new_y;
+    float new_z;
+	float vel;
+	float angle;
 
+    new_x = _position->getX();
+    new_y = _position->getY();
+    new_z = _position->getZ();	
+
+	vel = getVelocidade();
+	angle = getAngle();
+	
+	if(vel > 0.0f) {
+		vel -= 0.0005f;
+		if(vel < 0.0f) {
+			vel = 0.0f;
+		}
+	}
+
+	if(vel < 0.0f) {
+		vel += 0.0005f;
+		if(vel > 0.0f) {
+			vel = 0.0f;
+		}
+	}
+
+	setVelocidade(vel);
+
+	new_x += delta_t * ( vel * cos(-angle * 3.14f / 180.0f));
+	new_z += delta_t * ( vel * sin(-angle * 3.14f / 180.0f));
+	_position->set(new_x, new_y, new_z);
 }
 
+void Cheerios::setAngle(float varAngle){
+	_angle = varAngle;
+}
+float Cheerios::getAngle(){
+return _angle;
+}
+
+void Cheerios::setVelocidade(float velocidade){
+	_velocidade = velocidade;
+}
+float Cheerios::getVelocidade(){
+	return _velocidade;
+}

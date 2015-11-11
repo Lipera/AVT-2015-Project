@@ -26,7 +26,7 @@ private:
 public:
 	LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position);
 	LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position, float constantAtt, float linearAtt, float quadraticAtt);
-	LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position, float constantAtt, float linearAtt, float quadraticAtt, float cut_off, Vector4 *spot_direction);
+	LightSource(Vector4 *diffuse, Vector4 *specular, Vector4 *position, float constantAtt, float linearAtt, float quadraticAtt, float cut_off, float spot_exponent, Vector4 *spot_direction);
     ~LightSource();
 	void setAmbient(Vector4 *ambient);
 	void setDiffuse(Vector4 *diffuse);

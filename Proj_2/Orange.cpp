@@ -25,7 +25,7 @@ void Orange::create(struct MyMesh* mesh, int *objId){
 
 	float amb[]= {0.2f, 0.2f, 0.2f, 1.0f};
 	float diff[] = {1.0f, 0.43f, 0.09f, 1.0f};
-	float spec[] = {0.633f, 0.728f, 0.633f, 1.0f};
+	float spec[] = {0.1f, 0.2f, 0.1f, 1.0f};
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 50.0f;
@@ -57,7 +57,7 @@ void Orange::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId
 			
 			translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			//translate(MODEL, orangeX, orangeY, orangeZ);
-			rotate(MODEL, -_angle, 1.0f, 0.0f, 0.0f);
+			rotate(MODEL, -getAngle(), 1.0f, 0.0f, 0.0f);
 			//rotate(MODEL, _angle, 1.0f, 1.0f, 0.0f);
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -88,27 +88,27 @@ void Orange::update(int delta_t){
 	float z_speed; 
 	float angle;
 
-	angle = _angle;
+	angle = getAngle();
 
     new_x = _position->getX();
     new_y = _position->getY();
     new_z = _position->getZ();
 	
-	z_speed = _speed->getZ();
+	z_speed = getSpeed()->getZ();
 
 	if(z_speed <= 0.02){
 		z_speed += 0.00001f;
 		setSpeed(_speed->getX(), _speed->getY(), z_speed);
 	}
 
-			
+	//printf("%f\n", angle);		
 	if (angle <360.0){
 			angle = angle + 5.0f;
-			_angle = angle;
+			setAngle(angle);
 	}
 	else if (angle >=360.0) {
 		angle= 0.0f;
-		_angle = 0.0f;
+		setAngle(angle);
 	}
 	
 	new_z -= (delta_t * z_speed);

@@ -9,8 +9,9 @@ private:
 	float _aceleracao;
 	float _velocidade;
 	float _varVelocidade;
+	int _lives;
 public:
-    Car(float x, float y, float z);
+    Car(float x, float y, float z, int lives);
     ~Car();
     void create(struct MyMesh* mesh, int *objId);
 	void draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId);
@@ -24,6 +25,8 @@ public:
 	void setVarVelocidade(float varVelocidade);
 	float getVarVelocidade();
 	void updateAux(bool keyQ, bool keyA, bool keyO, bool keyP, int delta_t);
+	void setLives(int lives);
+	int getLives();
 };
 
 #endif
