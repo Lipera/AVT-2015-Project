@@ -235,7 +235,7 @@ void main() {
         reflectedLight += attenuation * spec * mat.specular;
 	}
 
-	colorOut = mat.emissive;
+	colorOut = vec4(vec3(mat.emissive),0.0);
 
 	//Textures where the light contribution is taken into account
 	if(texMode == 0) // modulate diffuse color with texel color
