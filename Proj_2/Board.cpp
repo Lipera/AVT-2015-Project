@@ -24,7 +24,7 @@ void Board::create(struct MyMesh* mesh, int *objId){
 	float spec[] = {0.8f, 0.8f, 0.8f, 1.0f};
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	float shininess= 100.0f;
+	float shininess= 50.0f;
 	int texcount = 0;
 
 	*objId=1;

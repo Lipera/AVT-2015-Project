@@ -164,7 +164,7 @@ GameManager::GameManager(){
 	_lights.push_back(light5);
 
 	//Sun Light
-	LightSource *light6 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(0.0f, 1.0f, 0.0f, 0.0f), 0.01f, 0.01f, 0.001f);
+	LightSource *light6 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(-0.28f, 0.27f, 0.0f, 0.0f), 0.01f, 0.01f, 0.001f);
 	light6->changeState(); //Sunlight starts enabled
 	_lights.push_back(light6);
 	//Car Lights
