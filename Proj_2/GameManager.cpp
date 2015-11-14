@@ -6,6 +6,7 @@
 #define DIRECITONAL_LIGHT_INDEX 6
 #define SPOT_LIGHT_INDEX 7
 #define SPOT_LIGHT_NUM 2
+#define PI 3.14
 
 int n_lives = INITIAL_LIVES;
 
@@ -150,17 +151,17 @@ GameManager::GameManager(){
 
 //--------------------------------------||----------------------------------------
 	//Candle Lights
-	LightSource *light0 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.0f, 2.70f, -3.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light0 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.0f, 2.70f, -3.0f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light0);
-	LightSource *light1 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-7.5f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light1 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-7.5f, 2.70f, -8.0f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light1);
-	LightSource *light2 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.5f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light2 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(8.5f, 2.70f, 9.0f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light2);
-	LightSource *light3 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-4.0f, 2.70f, 2.75f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light3 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(-4.0f, 2.70f, 2.75f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light3);
-	LightSource *light4 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(2.0f, 2.70f, -8.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light4 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(2.0f, 2.70f, -8.0f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light4);
-	LightSource *light5 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(3.0f, 2.70f, 9.0f, 1.0f), 0.02f, 0.02f, 0.02f);
+	LightSource *light5 = (LightSource*) new LightSource(new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(1.0f,0.35f,0.11f,1.0f), new Vector4(3.0f, 2.70f, 9.0f, 1.0f), 0.02f, 0.2f, 0.02f);
 	_lights.push_back(light5);
 
 	//Sun Light
@@ -168,9 +169,13 @@ GameManager::GameManager(){
 	light6->changeState(); //Sunlight starts enabled
 	_lights.push_back(light6);
 	//Car Lights
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
+	float spotDirX = cos((-_gameObject[8]->getAngle() * PI / 180.0f));
+	float spotDirY = 0.0f;
+	float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
+
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(carX, carY, carZ, 0.0f));
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light8);
 
 
