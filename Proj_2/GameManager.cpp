@@ -490,7 +490,7 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case 'h' :
 			if(play){
 				for(int j = 0; j < SPOT_LIGHT_NUM; j++) {
-					_lights[SPOT_LIGHT_INDEX]->changeState();
+					_lights[SPOT_LIGHT_INDEX+j]->changeState();
 				}
 			}
 			break;
