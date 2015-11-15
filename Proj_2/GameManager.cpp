@@ -184,9 +184,9 @@ GameManager::GameManager(){
 	float spotDirY = 0.0f;
 	float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ - 0.2f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ + 0.8f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light8);
 
 	//Fog
@@ -364,8 +364,15 @@ void GameManager::timer(int value){
 		float spotDirY = 0.0f;
 		float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() + (0.5f * spotDirZ), 1.0f));
-		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() - (0.5f * spotDirZ), 1.0f));
+		/*
+		Vector4 right_headlight = new Vector4(0.5f, 0.0f, 0.2f, 0.0f);
+		Vector4 left_headlight = new Vector4(0.5f, 0.0f, -0.2f, 0.0f);
+		Vector4 car_pos = new Vector4(_gameObject[8]->getPosition(), 1.0f);
+		Vector4 vec_dir = new Vector4(spotDirX, spotDirY, spotDirZ, 1.0f);
+		*/
+
+		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() - 0.2f, 1.0f));
+		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + 0.8f, 1.0f));
 
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
