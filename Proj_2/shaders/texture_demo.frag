@@ -138,6 +138,14 @@ void main() {
 	if(texMode == 0) // modulate diffuse color with texel color
 	{
 		texel = vec3(texture(texmap2, DataIn.tex_coord));  // texel from lighwood.tga
+
+		/*
+		if(isCarLife == 1) {
+			colorOut += vec4(max(vec3(mat.diffuse) * texel + vec3(mat.specular), vec3(mat.ambient) * texel), mat.diffuse.w);
+			return;
+		}
+		*/
+
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, vec3(mat.ambient) * texel), mat.diffuse.w);
 	}
 	else if (texMode == 1) // diffuse color is replaced by texel color, with specular area or ambient (0.1*texel)
