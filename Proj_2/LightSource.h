@@ -32,7 +32,7 @@ public:
 	void setDiffuse(Vector4 *diffuse);
 	void setSpecular(Vector4 *specular);
 	void setPosition(Vector4 *position);
-	//void setDirection(Vector3 *direction);
+	void setSpotDirection(Vector4* spot_direction);
 	void setCutOff(float cut_off);
 	void setExponent(float exponent);
 	int getState();

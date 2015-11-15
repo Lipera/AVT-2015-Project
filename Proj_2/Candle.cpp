@@ -45,7 +45,7 @@ void Candle::create (struct MyMesh* mesh, int *objId){
 	createCylinder(3.0f, 0.7f, 20);
 	
 
-	float emissive2[] = {1.0f, 1.0f, 1.0f, 1.0f}; 
+	float emissive2[] = {1.0f, 0.35f, 0.11f, 1.0f}; 
 
 	//chama base
 	*objId=4;

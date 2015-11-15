@@ -68,11 +68,9 @@ void LightSource::setPosition(Vector4 *position) {
 	_position = position;
 }
 
-/*
-void LightSource::setDirection(Vector3 direction) {
-	_direction = direction;
+void LightSource::setSpotDirection(Vector4* spot_direction) {
+	_spot_direction = spot_direction;
 }
-*/
 
 void LightSource::setCutOff(float cut_off) {
 	_cut_off = cut_off;
@@ -81,8 +79,6 @@ void LightSource::setCutOff(float cut_off) {
 void LightSource::setExponent(float exponent) {
 	_exponent = exponent;
 }
-
-//GLenum LightSource::getNum() {}
 
 int LightSource::getState() {
 	return _isEnabled;
