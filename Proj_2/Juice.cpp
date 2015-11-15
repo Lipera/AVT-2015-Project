@@ -20,8 +20,8 @@ Juice::~Juice(){
 void Juice::create(struct MyMesh* mesh, int *objId){
 
 	float amb[]= {0.2f, 0.2f, 0.2f, 1.0f};
-	float diff[] = {1.0f, 0.43f, 0.09f, 1.0f};
-	float spec[] = {0.1f, 0.2f, 0.1f, 1.0f};
+	float diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float spec[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	float emissive[] = {0.0f, 0.0f, 0.0f, 0.7f};
 	float shininess= 100.0f;
@@ -62,7 +62,7 @@ void Juice::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 	// Render mesh
-	glUniform1i(texMode_uniformId, 9 ); // modulate Phong color with texel color
+	glUniform1i(texMode_uniformId, 10); // modulate Phong color with texel color
 	//glUniform1i(texMode_uniformId, 1); // só componente especular
 	//glUniform1i(texMode_uniformId, 2); // multitexturing
 

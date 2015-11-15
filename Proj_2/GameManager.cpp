@@ -58,7 +58,7 @@ GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
 GLint texMode_uniformId;
 
-GLuint TextureArray[10];
+GLuint TextureArray[15];
 
 
 // Mouse Tracking Variables
@@ -365,6 +365,7 @@ void GameManager::timer(int value){
 
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+
 	}
 
 	
@@ -786,6 +787,8 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE9);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[9]);
 
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[10]);
 
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
@@ -798,7 +801,7 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc7, 7);
 		glUniform1i(tex_loc8, 8);
 		glUniform1i(tex_loc9, 9);
-
+		glUniform1i(tex_loc10, 10);
 
 		//Draw the lights
 		for(size_t i = 0; i < _lights.size(); i++) {
@@ -930,6 +933,8 @@ void GameManager::renderScene(void) {
 		//Fog
 	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
 	glUniform1i(loc, _isFogActive);
+	loc = glGetUniformLocation(shader.getProgramIndex(), "CameraHeight");
+	glUniform1f(loc, camY);
 
 
 }
@@ -968,6 +973,7 @@ GLuint GameManager::setupShaders() {
 	tex_loc7 = glGetUniformLocation(shader.getProgramIndex(), "texmap7");
 	tex_loc8 = glGetUniformLocation(shader.getProgramIndex(), "texmap8");
 	tex_loc9 = glGetUniformLocation(shader.getProgramIndex(), "texmap9");
+	tex_loc10 = glGetUniformLocation(shader.getProgramIndex(), "texmap10");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -1007,6 +1013,7 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "cheerio.tga", 7);
 	TGA_Texture(TextureArray, "candle.tga", 8);
 	TGA_Texture(TextureArray, "tree.tga", 9);
+	TGA_Texture(TextureArray, "juice.tga", 10);
 
 	int auxId;
 	objId = 0;
