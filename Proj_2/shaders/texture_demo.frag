@@ -14,7 +14,7 @@ uniform sampler2D texmap9;
 
 uniform int isCarLife;
 
-uniform bool isFogActive;
+int isFogActive;
 
 uniform int texMode;
 out vec4 colorOut;
@@ -182,7 +182,9 @@ void main() {
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), vec3(mat.ambient));
 	}
 	
-	if(isFogActive) {
+	isFogActive = 1;
+
+	if(isFogActive == 1) {
 		//distance
 		float dist = 0;
 		float fogFactor = 0;
@@ -190,11 +192,23 @@ void main() {
 		//range based fog
 		dist = length(DataIn.vertex_pos); 
 
+		
 		// exponential fog
 		fogFactor = 1.0 /exp(dist * FogDensity);
 		fogFactor = clamp( fogFactor, 0.0, 1.0 );
 
 		colorOut = vec4(mix(fogColor, vec3(colorOut), fogFactor), colorOut.a);
+		
+		/*
+		//my camera y is 10.0. you can change it or pass it as a uniform
+		float be = (10.0 - DataIn.vertex_pos.y) * 0.004;//0.004 is just a factor; change it if you want
+		float bi = (10.0 - DataIn.vertex_pos.y) * 0.001;//0.001 is just a factor; change it if you want
+
+		float ext = exp(-dist * be);
+		float insc = exp(-dist * bi);
+
+		colorOut = vec4(vec3(colorOut) * ext + fogColor * (1 - insc), colorOut.a);
+		*/
 	}
 
 }
