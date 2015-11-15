@@ -263,7 +263,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 	}
 
 	loc = glGetUniformLocation(shader.getProgramIndex(), "isCarLife");
-	glUniform1i(loc, _lives);
+	glUniform1i(loc, getLives());
 
 }
 

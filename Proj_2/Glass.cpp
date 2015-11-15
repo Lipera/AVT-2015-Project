@@ -34,7 +34,10 @@ void Glass::create(struct MyMesh* mesh, int *objId){
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
-	createCylinder( 4.0f, 1.0f, 20);
+	createTorus(1.0f, 1.25f, 20,20);
+	//createCylinder( 4.0f, 1.25f, 20);
+
+
 }
 
 void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
@@ -50,7 +53,8 @@ void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 	glUniform1f(loc,mesh[*objId].mat.shininess);
 	pushMatrix(MODEL);
-	translate(MODEL, 2.5f, 2.0f, -0.5f);
+	translate(MODEL, -1.5f, 1.0f, 2.5f);
+	scale(MODEL,1.0f, 13.0f, 1.0f);
 	
 	// send matrices to OGL
 	computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -69,4 +73,5 @@ void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	glBindVertexArray(0);
 
 	popMatrix(MODEL);
+
 }

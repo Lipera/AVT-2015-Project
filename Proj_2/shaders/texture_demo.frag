@@ -189,7 +189,15 @@ void main() {
 		texel = vec3(texture(texmap9, DataIn.tex_coord));  // texel from tree.tga
 		colorOut += vec4(max(scatteredLight + reflectedLight, vec3(mat.ambient)), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), vec3(mat.ambient));
-	}
+	}/*else if (texMode == 10)  {  // tree texture for billboard
+		texel = texture(texmap, DataIn.tex_coord);  		if(texel.a == 0.0) discard;
+		else
+			colorOut = vec4(max(intensity*texel.rgb + spec, 0.1*texel.rgb), texel.a);
+	}*/
+
+
+	//----------------------------------------FOG -------------------------------------------------
+
 
 	if(isFogActive) {
 		//distance

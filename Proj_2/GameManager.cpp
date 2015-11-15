@@ -22,6 +22,7 @@ bool gameOver = false;
 // Camera
 // Camera Position
 float camX, camY, camZ;
+float atX, atY, atZ;
 float carX = -10.0f, carY = 0.0f, carZ = -12.0f;
 float carAlpha = 0.0;
 float carAlphaVar = 0.0;
@@ -38,7 +39,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[15];
+struct MyMesh mesh[20];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -93,6 +94,7 @@ Cheerios* c;
 Billboard* b;
 Glass* glass;
 Coaster* coaster;
+Juice* juice;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
@@ -107,6 +109,8 @@ GameManager::GameManager(){
 	_cameras.push_back(cam2);
 	Camera* cam3 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,100.0f);
 	_cameras.push_back(cam3);
+	
+	//---------auxId-------------
 
 	table = new Table();
 	_gameObject.push_back(table); //table = 0
@@ -134,11 +138,14 @@ GameManager::GameManager(){
 	_gameObject.push_back(cheerio); //track = 11
 	glass = new Glass();
 	_gameObject.push_back(glass); //glass = 12
+	juice = new Juice();
+	_gameObject.push_back(juice); //juice = 13
 	coaster = new Coaster();
-	_gameObject.push_back(coaster); //glass = 13
+	_gameObject.push_back(coaster); //glass = 14
 
 	//billboard
 	b = new Billboard();
+	_gameObject.push_back(b); //billboard=15
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
@@ -180,7 +187,6 @@ GameManager::GameManager(){
 
 	//Fog
 	_isFogActive = false;
-
 }
 
 void GameManager::track(){
@@ -501,7 +507,6 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 				}
 			}
 			break;
-
 		case 'F':
 		case 'f':
 			if(play){
@@ -512,6 +517,12 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 		case '1':	if(play){
 						camS = 0; 
 						r=25.0f; 
+						camX=0.0f;
+						camY=20.0f;
+						camZ=0.0f;
+						atX=0.0f;
+						atY=0.0f;
+						atZ=0.0f;
 						printf("Orthogonal Camera\n"); 
 						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
 					}
@@ -522,6 +533,9 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 						camX = -28.0f;
 						camY = 27.0f; 
 						camZ = 0.0f;
+						atX=0.0f;
+						atY=0.0f;
+						atZ=0.0f;
 						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
 					}
 					break;
@@ -695,9 +709,9 @@ void GameManager::renderScene(void) {
 		loadIdentity(MODEL);
 		// set the camera using a function similar to gluLookAt
 		if(camS == 0){
-			lookAt(0.0, 20.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+			lookAt(camX, camY, camZ,  atX, atY, atZ, 1.0, 0.0, 0.0);
 		}else if(camS == 1){
-			lookAt(camX, camY, camZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+			lookAt(camX, camY, camZ, atX, atY, atZ, 0.0, 1.0, 0.0);
 		}else if(camS == 2){
 			float auxCarX = _gameObject[8]->getPosition()->getX();
 			float auxCarY = _gameObject[8]->getPosition()->getY();
@@ -709,8 +723,15 @@ void GameManager::renderScene(void) {
 			camX = auxCenterX;
 			camY = auxCenterY;
 			camZ = auxCenterZ;
-			lookAt(camX, camY, camZ, auxCarX, auxCarY, auxCarZ, 0.0, 1.0, 0.0);
+			atX = auxCarX;
+			atY = auxCarY;
+			atZ = auxCarZ;
+
+			lookAt(camX, camY, camZ, atX, atY, atZ, 0.0, 1.0, 0.0);
 		}
+
+		b->setCam(camX, camY, camZ);
+		b->setPos(atX, atY, atZ);
 		// use our shader
 		glUseProgram(shader.getProgramIndex());
 
@@ -799,67 +820,64 @@ void GameManager::renderScene(void) {
 				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			}
 		}
-			
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0);
-		
-		//glass and coaster
-		objId = 13;
-		for(auxId=12; auxId<14; auxId++, objId++){
-			if(auxId==12){
-				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			}else if (auxId==13){
-				glEnable(GL_STENCIL_TEST);
-				glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-				glStencilMask(0xFF); // Write to stencil buffer
-				glDepthMask(GL_FALSE); // Don't write to depth buffer
-				glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
-
-				_gameObject[auxId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-
-				glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-				glStencilMask(0x00); // Don't write anything to stencil buffer
-				glDepthMask(GL_TRUE); // Write to depth buffer
-				glDisable(GL_STENCIL_TEST);
-			}
-		
-		}
-
-		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
 
 		int cheerioId;
 		for(cheerioId=0; cheerioId<68; cheerioId++){
 			objId=12;
 			_track[cheerioId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
+		
+		//------------------- JUICE ------------------------------------
 
-	//#########################################################################################
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0);
-	glBindTexture(GL_TEXTURE_2D,TextureArray[9]);
-	pushMatrix(MODEL);
-	translate(MODEL, 0.0,0.0, 0.0);
-	b->billboardCheatSphericalBegin();
-	glBegin(GL_QUADS);
-		glTexCoord2f(0,0);glVertex3f(-3.0f, 0.0f, 0.0f);
-		glTexCoord2f(1,0);glVertex3f(3.0f, 0.0f, 0.0f);
-		glTexCoord2f(1,1);glVertex3f(3.0f, 6.0f,  0.0f);
-		glTexCoord2f(0,1);glVertex3f(-3.0f, 6.0f,  0.0f);
-		glEnd();
-	//b->billboardEnd();
-	popMatrix(MODEL);
+		objId = 14;
+		_gameObject[13]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-	glBindTexture(GL_TEXTURE_2D,0);
-	glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
+
+	
+
+		// ----------------- STENCIL ---------------------
+		objId=15;
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilMask(0xFF); // Write to stencil buffer
+		glDepthMask(GL_FALSE); // Don't write to depth buffer
+		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+		_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+
+		glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+		glStencilMask(0x00); // Don't write anything to stencil buffer
+		glDepthMask(GL_TRUE); // Write to depth buffer
+		glDisable(GL_STENCIL_TEST);
+
+
+	//---------------------------------BILLBOARD --------------------------------------
+		float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+	// use our shader
+	glUseProgram(shader.getProgramIndex());
+
+	//Associar os Texture Units aos Objects Texture
+	//tree.tga loaded in TU0; 
+	float res[4];
+	multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
+	glUniform4fv(lPos_uniformId, 1, res);
+	
+	glUniform1i(texMode_uniformId, 9); // to use phong color
+		objId=16;
+		_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			
-	//#####################################################################################################
+	//-----------------------------------------------------------------------------------
+
+		// ----------------- BLENDING (GLASS) ---------------------
+		objId=13;
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0);
+		_gameObject[12]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+		glDisable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
 
 //Select orthogonal camera and draw cars(lives) left
 
@@ -890,12 +908,6 @@ void GameManager::renderScene(void) {
 		objId=11;
         _gameObject[10]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
     }
-
-	//Fog
-	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
-	glUniform1i(loc, _isFogActive);
-	loc = glGetUniformLocation(shader.getProgramIndex(), "CameraHeight");
-	glUniform1f(loc, camY);
 		
 		glBindTexture(GL_TEXTURE_2D, 0);		
 		glutSwapBuffers();
@@ -905,7 +917,9 @@ void GameManager::renderScene(void) {
 
 	//para voltar a repor a camara do jogo
     _cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-
+		//Fog
+	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
+	glUniform1i(loc, _isFogActive);
 
 
 }
@@ -959,9 +973,16 @@ GLuint GameManager::setupShaders() {
 void GameManager::init(){
 
 	// set the camera position based on its spherical coordinates
-	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camY = r *   						     sin(beta * 3.14f / 180.0f);
+	//camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
+	//camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
+	//camY = r *   						     sin(beta * 3.14f / 180.0f);
+
+	camX=0.0f;
+	camY=20.0f;
+	camZ=0.0f;
+	atX=0.0f;
+	atY=0.0f;
+	atZ=0.0f;
 
 	//Texture Object definition
 	
@@ -979,7 +1000,7 @@ void GameManager::init(){
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<14; auxId++, objId++){
+	for(auxId=0; auxId<16; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);
@@ -987,15 +1008,7 @@ void GameManager::init(){
 		_gameObject[auxId]->create(mesh, &objId);
 	}
 
-	tImageTGA *image;
-
-	//glEnable(GL_DEPTH_TEST);
-	image = Load_TGA("tree.tga");
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->size_x, image->size_y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->data);
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

@@ -1,31 +1,154 @@
 #include "Billboard.h"
 
+extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
+
+/// The normal matrix
+extern float mNormal3x3[9];
+
+//constructor of the Billboard
+Billboard::Billboard(){}
+
+//destructor of the Billboard
+Billboard::~Billboard(){}
+
+//_____________________________________Get and Set__________________________________________
+
+void Billboard::setCam(float camX, float camY, float camZ){
+	_camX = camX;
+	_camY = camY;
+	_camZ = camZ;
+}
+
+void Billboard::setPos(float posX, float posY, float posZ){
+	_posX = posX;
+	_posY = posY;
+	_posZ = posZ;
+}
+
+float Billboard::getCamX(){
+	return _camX;
+}
+
+float Billboard::getCamY(){
+	return _camY;
+}
+
+float Billboard::getCamZ(){
+	return _camZ;
+}
+
+float Billboard::getPosX(){
+	return _posX;
+}
+
+float Billboard::getPosY(){
+	return _posY;
+}
+
+float Billboard::getPosZ(){
+	return _posZ;
+}
+
+//___________________________________________________________________________________________
+
+void Billboard::create(struct MyMesh* mesh, int *objId){
+
+	float spec[] = {0.9f, 0.9f, 0.9f, 1.0f};
+	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	float shininess= 1000.0f;
+	int texcount = 0;
+		
+	*objId=16;
+	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
+	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
+	mesh[*objId].mat.shininess = shininess;
+	mesh[*objId].mat.texCount = texcount;
+	createQuad(6,6);
+
+}
+
+void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
+	float modelview[16];
+		float pos[3];
+		//pos[0] = getPosX(); pos[1] = getPosY(); pos[2] = getPosZ();
+		pos[0] = 5.0; pos[1] = 0.0; pos[2] = 5.0;
+		float cam[3];
+		cam[0] = getCamX(); cam[1] = getCamY(); cam[2] = getCamZ();
+
+		 //Draw trees billboards
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+		glUniform1i(texMode_uniformId, 6); // draw textured quads
+	
+		pushMatrix(MODEL);
+		translate(MODEL,5,0,5);
+
+	
+		*objId=16;  //quad for tree
+		GLint loc;
+
+		//diffuse and ambient color are not used in the tree quads
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+		glUniform4fv(loc, 1, mesh[*objId].mat.specular);
+		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+		glUniform1f(loc,mesh[*objId].mat.shininess);
+	
+		pushMatrix(MODEL);
+		translate(MODEL, 0.0, 3.0, 0.0f);
+
+		computeDerivedMatrix(VIEW_MODEL);
+		memcpy(modelview, mCompMatrix[VIEW_MODEL], sizeof(float) * 16);
+
+		l3dBillboardCylindricalBegin(cam,pos);
+
+		//computeDerivedMatrix_PVM();
+
+		glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+		glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+		computeNormalMatrix3x3();
+		glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+		//glUniform1i(texMode_uniformId, 9); // multitexturing
+
+		glBindVertexArray(mesh[*objId].vao);
+		glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
+		popMatrix(MODEL);
+			
+		//	if (type==0 || type==1) // restore matrix   
+		//	BillboardEnd(modelview);   // não é necessário pois a PVM é sempre calculada a pArtir da MODEL e da VIEW que não são ALTERADAS
+		popMatrix(MODEL);
+		
+}
+
 
 /*-----------------------------------------------------------------
 The objects motion is restricted to a rotation on a predefined axis
 The function bellow does cylindrical billboarding on the Y axis, i.e.
 the object will be able to rotate on the Y axis only.
 -----------------------------------------------------------------*/
+/*
+void Billboard::l3dBillboardLocalToWorld(float *cam, float *worldPos) {
+	float *modelview;
 
-void Billboard::billboardLocalToWorld(float *cam, float *worldPos) {
-	float modelview[16];
-
-	glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+    // get the current modelview matrix
+    modelview = get(VIEW_MODEL);
 
 // The local origin's position in world coordinates
 	worldPos[0] = cam[0] + modelview[12]*modelview[0] + modelview[13] * modelview[1] + modelview[14] * modelview[2];
 	worldPos[1] = cam[1] + modelview[12]*modelview[4] + modelview[13] * modelview[5] + modelview[14] * modelview[6];
 	worldPos[2] = cam[2] + modelview[12]*modelview[8] + modelview[13] * modelview[9] + modelview[14] * modelview[10];
 }
-
+*/
 
 /*-----------------------------------------------------------------
 The following two methods get the right and up vectors of the 
 inverse of the top 3x3 submetrix from modelview.
 -----------------------------------------------------------------*/
 
-
-void Billboard::billboardGetRightVector(float *right) {
+/*
+void Billboard::l3dBillboardGetRightVector(float *right) {
 
 	float modelview[16];
 
@@ -36,7 +159,7 @@ void Billboard::billboardGetRightVector(float *right) {
 	right[2] = modelview[8];
 }
 
-void Billboard::billboardGetUpRightVector(float *up,float *right) {
+void l3dBillboardGetUpRightVector(float *up,float *right) {
 
 	float modelview[16];
 
@@ -51,13 +174,13 @@ void Billboard::billboardGetUpRightVector(float *up,float *right) {
 	up[2] = modelview[9];
 }
 
-
+*/
 /*-----------------------------------------------------------------
 The objects motion is restricted to a rotation on a predefined axis
 The function bellow does cylindrical billboarding on the Y axis, i.e.
 the object will be able to rotate on the Y axis only.
 -----------------------------------------------------------------*/
-void Billboard::billboardCylindricalBegin(float *cam, float *worldPos) {
+void Billboard::l3dBillboardCylindricalBegin(float *cam, float *worldPos) {
 
 	float lookAt[3]={0,0,1},objToCamProj[3],upAux[3],angleCosine;
 
@@ -85,7 +208,7 @@ void Billboard::billboardCylindricalBegin(float *cam, float *worldPos) {
 // if the lookAt and v vectors are too close together then |aux| could
 // be bigger than 1 due to lack of precision
 	if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
-		glRotatef(acos(angleCosine)*180/3.14,upAux[0], upAux[1], upAux[2]);	
+		rotate(MODEL,acos(angleCosine)*180/3.14,upAux[0], upAux[1], upAux[2]);
 }
 
 
@@ -96,7 +219,7 @@ the cylindrical billboard though. The parameters camX,camY, and camZ,
 are the target, i.e. a 3D point to which the object will point.
 ----------------------------------------------------------------*/
 
-void Billboard::billboardSphericalBegin(float *cam, float *worldPos) {
+void Billboard::l3dBillboardSphericalBegin(float *cam, float *worldPos) {
 
 	float lookAt[3]={0,0,1},objToCamProj[3],objToCam[3],upAux[3],angleCosine;
 
@@ -123,7 +246,7 @@ void Billboard::billboardSphericalBegin(float *cam, float *worldPos) {
 // if the lookAt and v vectors are too close together then |aux| could
 // be bigger than 1 due to lack of precision
 	if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
-		glRotatef(acos(angleCosine)*180/3.14,upAux[0], upAux[1], upAux[2]);	
+		rotate(MODEL,acos(angleCosine)*180/3.14,upAux[0], upAux[1], upAux[2]);
 
 
 // The second part tilts the object so that it faces the camera
@@ -145,9 +268,9 @@ void Billboard::billboardSphericalBegin(float *cam, float *worldPos) {
 // angle between them
 	if ((angleCosine < 0.99990) && (angleCosine > -0.9999))
 		if (objToCam[1] < 0)
-			glRotatef(acos(angleCosine)*180/3.14,1,0,0);	
+			rotate(MODEL,acos(angleCosine)*180/3.14,1,0,0);
 		else
-			glRotatef(acos(angleCosine)*180/3.14,-1,0,0);	
+			rotate(MODEL,acos(angleCosine)*180/3.14,-1,0,0);
 
 }
 
@@ -159,29 +282,20 @@ The object will face a plane perpendicular to the cameras
 "look at" vector. It is the fastest of them all though.
 ---------------------------------------------------------*/
 
-void Billboard::billboardCheatSphericalBegin() {
+void Billboard::BillboardCheatSphericalBegin() {
 	
-	float modelview[16];
+	
 	int i,j;
-
-	// save the current modelview matrix
-	glPushMatrix();
-
-	// get the current modelview matrix
-	glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
 
 	// undo all rotations
 	// beware all scaling is lost as well 
 	for( i=0; i<3; i++ ) 
 		for( j=0; j<3; j++ ) {
 			if ( i==j )
-				modelview[i*4+j] = 1.0;
+				mCompMatrix[VIEW_MODEL][i*4+j] = 1.0;
 			else
-				modelview[i*4+j] = 0.0;
+				mCompMatrix[VIEW_MODEL][i*4+j] = 0.0;
 		}
-
-	// set the modelview with no rotations
-	glLoadMatrixf(modelview);
 }
 
 
@@ -189,16 +303,9 @@ void Billboard::billboardCheatSphericalBegin() {
 The comments above apply in here as well but this is the
 cylindrical version, i.e. the up vector is not changed
 ---------------------------------------------------------*/
-void Billboard::billboardCheatCylindricalBegin() {
-	
-	float modelview[16];
+void Billboard::BillboardCheatCylindricalBegin() {
+
 	int i,j;
-
-	// save the current modelview matrix
-	glPushMatrix();
-
-	// get the current modelview matrix
-	glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
  
 	// Note that a row in the C convention is a column 
 	// in OpenGL convention (see the red book, pg.106 in version 1.2)
@@ -209,16 +316,11 @@ void Billboard::billboardCheatCylindricalBegin() {
 	for( i=0; i<3; i+=2 ) 
 		for( j=0; j<3; j++ ) {
 			if ( i==j )
-				modelview[i*4+j] = 1.0;
+				mCompMatrix[VIEW_MODEL][i*4+j] = 1.0;
 			else
-				modelview[i*4+j] = 0.0;
+				mCompMatrix[VIEW_MODEL][i*4+j] = 0.0;
 		}
-
-	// set the modelview matrix
-	glLoadMatrixf(modelview);
 }
-
-
 
 /* -------------------------------------------------------
 This function is provided just for the sake of clean code.
@@ -226,9 +328,8 @@ Since it is implemented as an inline there is no penalty
 for calling this function.
 --------------------------------------------------------*/
  
-inline void Billboard::billboardEnd() {
+void Billboard::BillboardEnd(float *m) {
 
 	// restore the previously stored modelview matrix
-	//glPopMatrix();
-	popMatrix(MODEL);
+	memcpy(mCompMatrix[VIEW_MODEL], m, sizeof(float) * 16);
 }

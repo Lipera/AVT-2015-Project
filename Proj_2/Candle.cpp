@@ -21,8 +21,8 @@ Candle::~Candle(){
 void Candle::create (struct MyMesh* mesh, int *objId){
 
 	float amb[] = { 0.25f, 0.25f, 0.25f, 1.0f };
-	float diff[] = { 0.4f, 0.4f, 0.4f, 1.0f };
-	float spec[] = { 0.774597f, 0.774597f, 0.774597f, 1.0f };
+	float diff[] = { 1.0f, 1.0f, 0.9f, 1.0f };
+	float spec[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	//yellow
 	float amb2[]= {0.0f, 0.0f, 0.0f, 1.0f};

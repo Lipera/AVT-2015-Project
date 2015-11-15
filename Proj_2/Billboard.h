@@ -2,22 +2,44 @@
 
 #include "AVTmathLib.h"
 
+#include "StaticObject.h"
 #include "maths.h"
 
 #ifndef BILLBOARD_H
 #define BILLBOARD_H
 
-class Billboard {
+class Billboard : public StaticObject {
+
+private:
+	float _camX;
+	float _camY;
+	float _camZ;
+	float _posX;
+	float _posY;
+	float _posZ;
 
 public:
-	void billboardGetRightVector(float *right);
-	void billboardGetUpRightVector(float *up, float *right);
-	void billboardLocalToWorld(float *cam, float *worldPos);
-	void billboardCylindricalBegin(float *cam, float *worldPos);
-	void billboardSphericalBegin(float *cam, float *worldPos);
-	void billboardCheatSphericalBegin(void);
-	void billboardCheatCylindricalBegin(void);
-	void billboardEnd(void);
+	Billboard();
+	~Billboard();
+	float getCamX();
+	float getCamY();
+	float getCamZ();
+	void setCam(float camX, float camY, float camZ);
+	float getPosX();
+	float getPosY();
+	float getPosZ();
+	void setPos(float posX, float posY, float posZ);
+	//void l3dBillboardGetRightVector(float *right);
+	//void l3dBillboardGetUpRightVector(float *up, float *right);
+	void l3dBillboardLocalToWorld(float *cam, float *worldPos);
+	void l3dBillboardCylindricalBegin(float *cam, float *worldPos);
+	void l3dBillboardSphericalBegin(float *cam, float *worldPos);
+	void BillboardCheatSphericalBegin();
+	void BillboardCheatCylindricalBegin();
+	void BillboardEnd(float *m);
+	void create(struct MyMesh* mesh, int *objId);
+	void draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId);
+
 };
 
 #endif

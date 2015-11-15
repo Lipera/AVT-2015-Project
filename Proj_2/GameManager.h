@@ -24,6 +24,7 @@
 #include "Billboard.h"
 #include "Glass.h"
 #include "Coaster.h"
+#include "Juice.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"

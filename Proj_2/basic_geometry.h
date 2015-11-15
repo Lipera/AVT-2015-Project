@@ -1,6 +1,5 @@
-#ifndef __BASIC_GEOMETRY__
-#define __BASIC_GEOMETRY__
-
+#ifndef BASIC_GEOMETRY_H
+#define BASIC_GEOMETRY_H
 #define MAX_TEXTURES 4
 
 struct Material{
@@ -23,6 +22,7 @@ struct MyMesh {
 	};
 
 void createCube();
+void createQuad(float size_x, float size_y);
 void createSphere(float radius, int divisions);
 void createTorus(float innerRadius, float outerRadius, int rings, int sides);
 void createCylinder(float height, float radius, int sides);
