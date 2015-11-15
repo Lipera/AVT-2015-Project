@@ -795,6 +795,7 @@ void GameManager::renderScene(void) {
 		glBindTexture(GL_TEXTURE_2D, TextureArray[10]);
 
 		glActiveTexture(GL_TEXTURE11);
+
 		glBindTexture(GL_TEXTURE_2D, TextureArray[11]);
 
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
@@ -853,8 +854,13 @@ void GameManager::renderScene(void) {
 		objId = 14;
 		_gameObject[13]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-		// ----------------- STENCIL ---------------------
-		objId=15;
+		// ----------------- STENCIL --------------------
+		
+			//------------------- RUBIK ------------------------------------
+
+			objId = 16;
+			_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+		glEnable(GL_BLEND);
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
 		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -862,20 +868,31 @@ void GameManager::renderScene(void) {
 		glDepthMask(GL_FALSE); // Don't write to depth buffer
 		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 
-		_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			// Draw coaster
+			objId=15;
+			_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-		glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
-		glStencilMask(0x00); // Don't write anything to stencil buffer
-		glDepthMask(GL_TRUE); // Write to depth buffer
+			// Draw rubik cube reflection
+            glStencilFunc(GL_EQUAL, 1, 0xFF);
+            glStencilMask(0x00);
+            glDepthMask(GL_TRUE);
+
+			objId=16;
+			pushMatrix(MODEL);
+			
+			//rotate(MODEL,90, 0.0f, 0.0f, 1.0f);
+			//rotate(MODEL,90, 0.0f, 0.0f, 1.0f);
+			//rotate(MODEL,180, 0.0f, 0.0f, 1.0f);
+			translate(MODEL, 0.0f, -2.9f, 0.0f);
+			_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			popMatrix(MODEL);
+
 		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_BLEND);
 
-		//------------------- RUBIK ------------------------------------
-
-		objId = 16;
-		_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
 	//---------------------------------BILLBOARD --------------------------------------
-		float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+	/*	float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
@@ -888,7 +905,7 @@ void GameManager::renderScene(void) {
 	glUniform1i(texMode_uniformId, 9); // to use phong color
 		objId=17;
 		_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			
+			*/
 	//-----------------------------------------------------------------------------------
 
 		// ----------------- BLENDING (GLASS) ---------------------

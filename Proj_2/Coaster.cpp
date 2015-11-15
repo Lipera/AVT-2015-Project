@@ -19,12 +19,12 @@ Coaster::~Coaster(){
 //desenha mesa
 void Coaster::create(struct MyMesh* mesh, int *objId){
 
-	float amb[]= {0.2f, 0.2f, 0.2f, 1.0f};
+	float amb[]= {0.3f, 0.3f, 0.3f, 1.0f};
 	float diff[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	float spec[] = {0.1f, 0.1f, 0.1f, 1.0f};
+	float spec[] = {0.0f, 0.0f, 0.0f, 1.0f};
 
-	float emissive[] = {0.5f, 0.5f, 0.5f, 1.0f};
-	float shininess= 300.0f;
+	float emissive[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float shininess= 100.0f;
 	int texcount = 0;
 
 	*objId=15;
