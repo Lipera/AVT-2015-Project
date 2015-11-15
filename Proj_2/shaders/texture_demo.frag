@@ -14,7 +14,7 @@ uniform sampler2D texmap9;
 
 uniform int isCarLife;
 
-int isFogActive;
+uniform bool isFogActive;
 
 uniform int texMode;
 out vec4 colorOut;
@@ -181,10 +181,8 @@ void main() {
 		colorOut += vec4(max(scatteredLight + reflectedLight, vec3(mat.ambient)), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), vec3(mat.ambient));
 	}
-	
-	isFogActive = 1;
 
-	if(isFogActive == 1) {
+	if(isFogActive) {
 		//distance
 		float dist = 0;
 		float fogFactor = 0;
@@ -194,7 +192,7 @@ void main() {
 
 		
 		// exponential fog
-		fogFactor = 1.0 /exp(dist * FogDensity);
+		fogFactor = 1.0 /exp((dist * FogDensity) * (dist * FogDensity));
 		fogFactor = clamp( fogFactor, 0.0, 1.0 );
 
 		colorOut = vec4(mix(fogColor, vec3(colorOut), fogFactor), colorOut.a);

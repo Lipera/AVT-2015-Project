@@ -54,6 +54,7 @@ private:
 	int _WinX;
 	int _WinY;
 	int _WindowHandle;
+	bool _isFogActive;
 	std::vector<GameObject*> _gameObject;
 	std::vector<Camera*> _cameras;
 	std::vector<GameObject*> _lives;

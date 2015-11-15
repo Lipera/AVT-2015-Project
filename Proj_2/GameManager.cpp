@@ -178,6 +178,8 @@ GameManager::GameManager(){
 	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 45.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light8);
 
+	//Fog
+	_isFogActive = false;
 
 }
 
@@ -497,6 +499,13 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 				for(int j = 0; j < SPOT_LIGHT_NUM; j++) {
 					_lights[SPOT_LIGHT_INDEX+j]->changeState();
 				}
+			}
+			break;
+
+		case 'F':
+		case 'f':
+			if(play){
+				_isFogActive = !_isFogActive;
 			}
 			break;
 
@@ -881,6 +890,10 @@ void GameManager::renderScene(void) {
 		objId=11;
         _gameObject[10]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
     }
+
+	//Fog
+	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
+	glUniform1i(loc, _isFogActive);
 		
 		glBindTexture(GL_TEXTURE_2D, 0);		
 		glutSwapBuffers();
