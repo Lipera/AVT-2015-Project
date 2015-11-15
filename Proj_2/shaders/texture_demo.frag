@@ -15,6 +15,7 @@ uniform sampler2D texmap9;
 uniform int isCarLife;
 
 uniform bool isFogActive;
+uniform float CameraHeight;
 
 uniform int texMode;
 out vec4 colorOut;
@@ -199,8 +200,8 @@ void main() {
 		
 		/*
 		//my camera y is 10.0. you can change it or pass it as a uniform
-		float be = (10.0 - DataIn.vertex_pos.y) * 0.004;//0.004 is just a factor; change it if you want
-		float bi = (10.0 - DataIn.vertex_pos.y) * 0.001;//0.001 is just a factor; change it if you want
+		float be = (CameraHeight - DataIn.vertex_pos.y) * 0.004;//0.004 is just a factor; change it if you want
+		float bi = (CameraHeight - DataIn.vertex_pos.y) * 0.001;//0.001 is just a factor; change it if you want
 
 		float ext = exp(-dist * be);
 		float insc = exp(-dist * bi);

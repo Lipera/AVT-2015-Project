@@ -894,6 +894,8 @@ void GameManager::renderScene(void) {
 	//Fog
 	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
 	glUniform1i(loc, _isFogActive);
+	loc = glGetUniformLocation(shader.getProgramIndex(), "CameraHeight");
+	glUniform1f(loc, camY);
 		
 		glBindTexture(GL_TEXTURE_2D, 0);		
 		glutSwapBuffers();
