@@ -15,6 +15,7 @@ out Data {
 	vec3 normal;
 	vec3 eye;
 	vec2 tex_coord;
+	vec3 vertex_pos;
 } DataOut;
 
 void main () {
@@ -24,6 +25,7 @@ void main () {
 	DataOut.normal = normalize(m_normal * normal.xyz);
 	DataOut.eye = vec3(-pos);
 	DataOut.tex_coord = texCoord.st;
+	DataOut.vertex_pos = vec3(pos);
 
 	gl_Position = m_pvm * position;	
 }

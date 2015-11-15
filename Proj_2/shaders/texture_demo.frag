@@ -14,6 +14,8 @@ uniform sampler2D texmap9;
 
 uniform int isCarLife;
 
+uniform bool isFogActive;
+
 uniform int texMode;
 out vec4 colorOut;
 struct Light {
@@ -47,8 +49,11 @@ in Data {
 	vec3 normal;
 	vec3 eye;
 	vec2 tex_coord;
+	vec3 vertex_pos;
 } DataIn;
 
+const vec3 fogColor = vec3(0.5, 0.5,0.5);
+const float FogDensity = 0.05;
 
 void main() {
 
@@ -90,7 +95,7 @@ void main() {
 		}
 		
 		else { //Spotlight or Pointlight
-			vec3 ld = vec3(lights[i].position) + DataIn.eye;
+			vec3 ld = vec3(lights[i].position) - DataIn.vertex_pos;
 			float lightDistance = length(ld);
 			//lightDirection = lightDirection / lightDistance;
 
@@ -175,6 +180,21 @@ void main() {
 		texel = vec3(texture(texmap9, DataIn.tex_coord));  // texel from tree.tga
 		colorOut += vec4(max(scatteredLight + reflectedLight, vec3(mat.ambient)), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), vec3(mat.ambient));
-	} 
+	}
+	
+	if(isFogActive) {
+		//distance
+		float dist = 0;
+		float fogFactor = 0;
+
+		//range based fog
+		dist = length(DataIn.vertex_pos); 
+
+		// exponential fog
+		fogFactor = 1.0 /exp(dist * FogDensity);
+		fogFactor = clamp( fogFactor, 0.0, 1.0 );
+
+		colorOut = vec4(mix(fogColor, vec3(colorOut), fogFactor), colorOut.a);
+	}
 
 }
