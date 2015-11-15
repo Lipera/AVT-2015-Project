@@ -62,7 +62,7 @@ void Coaster::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformI
 	glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 	// Render mesh
-	//glUniform1i(texMode_uniformId, 0); // modulate Phong color with texel color
+	glUniform1i(texMode_uniformId, 9); // modulate Phong color with texel color
 	//glUniform1i(texMode_uniformId, 1); // só componente especular
 	//glUniform1i(texMode_uniformId, 2); // multitexturing
 

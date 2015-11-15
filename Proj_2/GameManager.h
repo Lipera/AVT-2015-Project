@@ -25,6 +25,7 @@
 #include "Glass.h"
 #include "Coaster.h"
 #include "Juice.h"
+#include "Rubik.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"

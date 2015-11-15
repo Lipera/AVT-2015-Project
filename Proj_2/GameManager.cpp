@@ -39,7 +39,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[20];
+struct MyMesh mesh[25];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -56,6 +56,7 @@ GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
+GLint tex_loc11;
 GLint texMode_uniformId;
 
 GLuint TextureArray[15];
@@ -95,6 +96,7 @@ Billboard* b;
 Glass* glass;
 Coaster* coaster;
 Juice* juice;
+Rubik* rubik;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
@@ -142,10 +144,12 @@ GameManager::GameManager(){
 	_gameObject.push_back(juice); //juice = 13
 	coaster = new Coaster();
 	_gameObject.push_back(coaster); //glass = 14
+	rubik = new Rubik();
+	_gameObject.push_back(rubik); //rubik = 15
 
 	//billboard
 	b = new Billboard();
-	_gameObject.push_back(b); //billboard=15
+	_gameObject.push_back(b); //billboard=16
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
@@ -790,6 +794,9 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE10);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[10]);
 
+		glActiveTexture(GL_TEXTURE11);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[11]);
+
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
 		glUniform1i(tex_loc1, 1); 
@@ -802,7 +809,8 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc8, 8);
 		glUniform1i(tex_loc9, 9);
 		glUniform1i(tex_loc10, 10);
-
+		glUniform1i(tex_loc11, 11);
+		
 		//Draw the lights
 		for(size_t i = 0; i < _lights.size(); i++) {
 			_lights[i]->draw(i, shader);
@@ -845,9 +853,6 @@ void GameManager::renderScene(void) {
 		objId = 14;
 		_gameObject[13]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-
-	
-
 		// ----------------- STENCIL ---------------------
 		objId=15;
 		glEnable(GL_STENCIL_TEST);
@@ -864,6 +869,10 @@ void GameManager::renderScene(void) {
 		glDepthMask(GL_TRUE); // Write to depth buffer
 		glDisable(GL_STENCIL_TEST);
 
+		//------------------- RUBIK ------------------------------------
+
+		objId = 16;
+		_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
 	//---------------------------------BILLBOARD --------------------------------------
 		float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
@@ -877,8 +886,8 @@ void GameManager::renderScene(void) {
 	glUniform4fv(lPos_uniformId, 1, res);
 	
 	glUniform1i(texMode_uniformId, 9); // to use phong color
-		objId=16;
-		_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+		objId=17;
+		_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			
 	//-----------------------------------------------------------------------------------
 
@@ -974,6 +983,7 @@ GLuint GameManager::setupShaders() {
 	tex_loc8 = glGetUniformLocation(shader.getProgramIndex(), "texmap8");
 	tex_loc9 = glGetUniformLocation(shader.getProgramIndex(), "texmap9");
 	tex_loc10 = glGetUniformLocation(shader.getProgramIndex(), "texmap10");
+	tex_loc11 = glGetUniformLocation(shader.getProgramIndex(), "texmap11");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -1002,7 +1012,7 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(10, TextureArray);
+	glGenTextures(11, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
@@ -1014,10 +1024,11 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "candle.tga", 8);
 	TGA_Texture(TextureArray, "tree.tga", 9);
 	TGA_Texture(TextureArray, "juice.tga", 10);
+	TGA_Texture(TextureArray, "rubik.tga", 11);
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<16; auxId++, objId++){
+	for(auxId=0; auxId<17; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);

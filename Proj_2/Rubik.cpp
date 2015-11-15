@@ -1,4 +1,4 @@
-#include "Glass.h"
+#include "Rubik.h"
 
 /// The storage for matrices
 extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
@@ -7,39 +7,38 @@ extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
 extern float mNormal3x3[9];
 
 //constructor
-Glass::Glass(){
+Rubik::Rubik(){
     //to do
 }
 
 //destructor
-Glass::~Glass(){
+Rubik::~Rubik(){
     //to do
 }
 
 //desenha mesa
-void Glass::create(struct MyMesh* mesh, int *objId){
+void Rubik::create(struct MyMesh* mesh, int *objId){
 
-	float amb[]= {0.2f, 0.15f, 0.1f, 0.7f};
-	float diff[] = {0.5f, 0.8f, 0.95f, 0.7f};
-	float spec[] = {0.6f, 0.7f, 0.6f, 0.7f};
+	float amb[]= {0.2f, 0.2f, 0.2f, 1.0f};
+	float diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float spec[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-	float emissive[] = {0.0f, 0.0f, 0.0f, 0.7f};
-	float shininess= 100.0f;
+	float emissive[] = {0.5f, 0.5f, 0.5f, 1.0f};
+	float shininess= 300.0f;
 	int texcount = 0;
 
-	*objId=13;
+	*objId=16;
 	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
 	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
-	createTorus(1.0f, 1.25f, 20,20);
-
+	createCube();
 }
 
-void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
-	*objId=13;
+void Rubik::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
+	*objId=16;
 	GLint loc;
 	// send the material
 	loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
@@ -51,9 +50,10 @@ void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 	glUniform1f(loc,mesh[*objId].mat.shininess);
 	pushMatrix(MODEL);
-	translate(MODEL, -1.5f, 1.0f, 2.5f);
-	scale(MODEL,1.0f, 13.0f, 1.0f);
+	translate(MODEL, 1.0f, 0.5f, -2.0f);
+	scale(MODEL, 3.0f, 3.0f, 3.0f);
 	
+
 	// send matrices to OGL
 	computeDerivedMatrix(PROJ_VIEW_MODEL);
 	glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
@@ -62,7 +62,7 @@ void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 	// Render mesh
-	glUniform1i(texMode_uniformId, 9); // modulate Phong color with texel color
+	glUniform1i(texMode_uniformId, 11); // modulate Phong color with texel color
 	//glUniform1i(texMode_uniformId, 1); // só componente especular
 	//glUniform1i(texMode_uniformId, 2); // multitexturing
 
@@ -71,5 +71,4 @@ void Glass::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	glBindVertexArray(0);
 
 	popMatrix(MODEL);
-
 }

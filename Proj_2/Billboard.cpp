@@ -58,7 +58,7 @@ void Billboard::create(struct MyMesh* mesh, int *objId){
 	float shininess= 1000.0f;
 	int texcount = 0;
 		
-	*objId=16;
+	*objId=17;
 	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
@@ -86,7 +86,7 @@ void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 		translate(MODEL,5,0,5);
 
 	
-		*objId=16;  //quad for tree
+		*objId=17;  //quad for tree
 		GLint loc;
 
 		//diffuse and ambient color are not used in the tree quads
