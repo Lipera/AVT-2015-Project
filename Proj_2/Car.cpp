@@ -15,8 +15,8 @@ Car::Car(float x, float y, float z, int lives){
 	setVarAngle(0.0f);
 	setAceleracao(0.0f);
 	setVelocidade(0.0f);
-	_bottomLeft = new Vector3(-0.65f, 0.0f, -0.3f);
-	_topRight = new Vector3(0.9f, 0.0f, 0.9f);
+	_bottomLeft = new Vector3(-0.7f, 0.0f, -0.65f);
+	_topRight = new Vector3(0.85f, 0.0f, 0.65f);
 	setLives(lives);
 }
 
@@ -118,10 +118,9 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
 			//translate(MODEL, carX, carY, carZ);
-			translate(MODEL, -1.5f, 0.5f, 0.0f);
+			translate(MODEL, -1.25f, 0.5f, -0.325f);
 			//rotate(MODEL, carAlpha, 0.0, 1.0, 0.0);
 			scale(MODEL, 2.5f, 0.50f, 0.75f);
-
 			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
 			computeDerivedMatrix(PROJ_VIEW_MODEL);
@@ -152,7 +151,7 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
-			translate(MODEL, -1.0f, 1.0f, 0.0f);
+			translate(MODEL, -0.5f, 1.0f, -0.325f);
 			scale(MODEL, 1.0f, 0.50f, 0.75f);
 			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
 			// send matrices to OGL
@@ -189,10 +188,10 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			pushMatrix(MODEL);
 
 			if(aux==0){
-				translate(MODEL, 0.35f, 0.5f, 0.35f);
+				translate(MODEL, 0.35f, 0.5f, 0.0f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			}else if (aux==1) {
-				translate(MODEL, -0.9f, 0.5f, 0.35f);
+				translate(MODEL, -0.9f, 0.5f, 0.0f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} 
 			//translate(MODEL, _position->getX(), _position->getY(), _position->getZ());
@@ -229,16 +228,16 @@ void Car::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, G
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
 			if(aux3==0){
-				translate(MODEL, 0.35f, 0.5f, 0.55f);
+				translate(MODEL, 0.35f, 0.5f, 0.3f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			}else if (aux3==1) {
-				translate(MODEL, -0.9f, 0.5f, 0.55f);
+				translate(MODEL, -0.9f, 0.5f, 0.3f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} else if (aux3==2) {
-				translate(MODEL, 0.35f, 0.5f, -0.5f);
+				translate(MODEL, 0.35f, 0.5f, -0.9f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} else  {
-				translate(MODEL, -0.9f, 0.5f, -0.5f);
+				translate(MODEL, -0.9f, 0.5f, -0.9f);
 				rotate(MODEL, 90.0f, 1.0f, 0.0f, 0.0f);
 			} 
 			translate(MODEL, 0.0f, 0.35f, 0.0f);

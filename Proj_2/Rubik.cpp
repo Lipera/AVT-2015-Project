@@ -7,13 +7,22 @@ extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
 extern float mNormal3x3[9];
 
 //constructor
-Rubik::Rubik(){
+Rubik::Rubik(int i){
     //to do
+	setRubikStencil(i);
 }
 
 //destructor
 Rubik::~Rubik(){
     //to do
+}
+
+void Rubik::setRubikStencil(int i){
+	_rubikStencil = i;
+}
+	
+int Rubik::getRubikStencil(){
+	return _rubikStencil;
 }
 
 //desenha mesa
@@ -62,7 +71,11 @@ void Rubik::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId,
 	glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
 	// Render mesh
-	glUniform1i(texMode_uniformId, 11); // modulate Phong color with texel color
+	if(getRubikStencil()==0){
+		glUniform1i(texMode_uniformId, 11); 
+	}else if (getRubikStencil()==1){
+		glUniform1i(texMode_uniformId, 12);
+	}
 	//glUniform1i(texMode_uniformId, 1); // só componente especular
 	//glUniform1i(texMode_uniformId, 2); // multitexturing
 

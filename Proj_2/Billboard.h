@@ -17,10 +17,12 @@ private:
 	float _posX;
 	float _posY;
 	float _posZ;
+	int _reflection;
 
 public:
 	Billboard();
 	~Billboard();
+	void setReflection(int reflection);
 	float getCamX();
 	float getCamY();
 	float getCamZ();

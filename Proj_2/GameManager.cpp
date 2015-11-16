@@ -56,7 +56,7 @@ GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
-GLint tex_loc11;
+GLint tex_loc11, tex_loc12;
 GLint texMode_uniformId;
 
 GLuint TextureArray[15];
@@ -66,8 +66,8 @@ GLuint TextureArray[15];
 int startX, startY, tracking = 0;
 
 // Camera Spherical Coordinates
-float alpha = 39.0f, beta = 51.0f;
-float r = 10.0f;
+float alpha = 0.0f, beta = 0.0f;
+float r = 6.0f;
 
 // Frame counting and FPS computation
 long myTime,timebase = 0,frame = 0;
@@ -75,7 +75,7 @@ char s[32];
 //float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 
 //orange Position
-float orangeX = 6.0f, orangeY = 2.0f, orangeZ = 15.5f;
+float orangeX = 6.0f, orangeY = 1.25f, orangeZ = 15.5f;
 
 //------------------create object class---------------------
 
@@ -97,6 +97,7 @@ Glass* glass;
 Coaster* coaster;
 Juice* juice;
 Rubik* rubik;
+Rubik* rubik2;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
@@ -111,6 +112,8 @@ GameManager::GameManager(){
 	_cameras.push_back(cam2);
 	Camera* cam3 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,100.0f);
 	_cameras.push_back(cam3);
+	Camera* cam4 = (Camera*) new PerspectiveCamera(53.13f, 1.0f, 0.1f,1000.0f);
+	_cameras.push_back(cam4);
 	
 	//---------auxId-------------
 
@@ -144,12 +147,13 @@ GameManager::GameManager(){
 	_gameObject.push_back(juice); //juice = 13
 	coaster = new Coaster();
 	_gameObject.push_back(coaster); //glass = 14
-	rubik = new Rubik();
+	rubik = new Rubik(0);
 	_gameObject.push_back(rubik); //rubik = 15
-
+	rubik2 = new Rubik(1);
+	_gameObject.push_back(rubik2); //rubik = 16
 	//billboard
 	b = new Billboard();
-	_gameObject.push_back(b); //billboard=16
+	_gameObject.push_back(b); //billboard=17
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
@@ -184,9 +188,9 @@ GameManager::GameManager(){
 	float spotDirY = 0.0f;
 	float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ - 0.2f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ + 0.8f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light8);
 
 	//Fog
@@ -364,15 +368,8 @@ void GameManager::timer(int value){
 		float spotDirY = 0.0f;
 		float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-		/*
-		Vector4 right_headlight = new Vector4(0.5f, 0.0f, 0.2f, 0.0f);
-		Vector4 left_headlight = new Vector4(0.5f, 0.0f, -0.2f, 0.0f);
-		Vector4 car_pos = new Vector4(_gameObject[8]->getPosition(), 1.0f);
-		Vector4 vec_dir = new Vector4(spotDirX, spotDirY, spotDirZ, 1.0f);
-		*/
-
-		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() - 0.2f, 1.0f));
-		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + 0.8f, 1.0f));
+		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() + (0.5f * spotDirZ), 1.0f));
+		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() - (0.5f * spotDirZ), 1.0f));
 
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
@@ -567,6 +564,12 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
 					}
 					break;
+		case '4':	if(play){
+						camS = 4; 
+						printf("Perspective Camera in car\n"); 
+						reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)); 
+					}
+					break;
 
 		case 'O':
         case 'o': // mover o carro para a esquerda
@@ -631,86 +634,88 @@ void GameManager::processKeysUp(unsigned char key, int xx, int yy){
 
 void GameManager::processMouseButtons(int button, int state, int xx, int yy){
 	if(camS == 2){
-	// start tracking the mouse
-	if (state == GLUT_DOWN)  {
-		startX = xx;
-		startY = yy;
-		if (button == GLUT_LEFT_BUTTON)
-			tracking = 1;
-		else if (button == GLUT_RIGHT_BUTTON)
-			tracking = 2;
-	}
+		// start tracking the mouse
+		if (state == GLUT_DOWN)  {
+			alpha = _gameObject[8]->getAngle() + 90;
+			beta = 0;
+			startX = xx;
+			startY = yy;
+			if (button == GLUT_LEFT_BUTTON)
+				tracking = 1;
+			else if (button == GLUT_RIGHT_BUTTON)
+				tracking = 2;
+		}
 
-	//stop tracking the mouse
-	else if (state == GLUT_UP) {
-		if (tracking == 1) {
-			alpha -= (xx - startX);
-			beta += (yy - startY);
+		//stop tracking the mouse
+		else if (state == GLUT_UP) {
+			if (tracking == 1) {
+				alpha -= (xx - startX);
+				beta += (yy - startY);
+			}
+			else if (tracking == 2) {
+				r += (yy - startY) * 0.01f;
+				if (r < 0.1f)
+					r = 0.1f;
+			}
+			tracking = 0;
 		}
-		else if (tracking == 2) {
-			r += (yy - startY) * 0.01f;
-			if (r < 0.1f)
-				r = 0.1f;
-		}
-		tracking = 0;
 	}
-}
 }
 
 // -------------------------Track mouse motion while buttons are pressed-------------------------
 
 void GameManager::processMouseMotion(int xx, int yy){
 	if(camS == 2) {
-	int deltaX, deltaY;
-	float alphaAux, betaAux;
-	float rAux;
+		int deltaX, deltaY;
+		float alphaAux, betaAux;
+		float rAux;
 
-	deltaX =  - xx + startX;
-	deltaY =    yy - startY;
+		deltaX =  - xx + startX;
+		deltaY =    yy - startY;
 
-	// left mouse button: move camera
-	if (tracking == 1) {
+		// left mouse button: move camera
+		if (tracking == 1) {
 
 
-		alphaAux = alpha + deltaX;
-		betaAux = beta + deltaY;
+			alphaAux = alpha + deltaX;
+			betaAux = beta + deltaY;
 
-		if (betaAux > 85.0f)
-			betaAux = 85.0f;
-		else if (betaAux < -85.0f)
-			betaAux = -85.0f;
-		rAux = r;
+			/*if (betaAux > 85.0f)
+				betaAux = 85.0f;
+			else if (betaAux < -85.0f)
+				betaAux = -85.0f;*/
+			rAux = r;
+		}
+		// right mouse button: zoom
+		else if (tracking == 2) {
+
+			alphaAux = alpha;
+			betaAux = beta;
+			rAux = r + (deltaY * 0.01f);
+			if (rAux < 0.1f)
+				rAux = 0.1f;
+		}
+
+		atX = camX + rAux * sin(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
+		atZ = camZ + rAux * cos(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
+		atY = camY + rAux *   						       sin(betaAux * 3.14f / 180.0f);
+
 	}
-	// right mouse button: zoom
-	else if (tracking == 2) {
-
-		alphaAux = alpha;
-		betaAux = beta;
-		rAux = r + (deltaY * 0.01f);
-		if (rAux < 0.1f)
-			rAux = 0.1f;
-	}
-
-	camX = rAux * sin(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
-	camZ = rAux * cos(alphaAux * 3.14f / 180.0f) * cos(betaAux * 3.14f / 180.0f);
-	camY = rAux *   						       sin(betaAux * 3.14f / 180.0f);
-
-	}
-//  uncomment this if not using an idle func
-//	glutPostRedisplay();
+	//  uncomment this if not using an idle func
+	//	glutPostRedisplay();
 }
 
 
 void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
 	if(camS == 2) {
-	//velocidade do zoom
-	r += direction * 0.75f;
-	if (r < 0.1f)
-		r = 0.1f;
+		//velocidade do zoom
+		r += direction * 0.75f;
+		if (r < 0.1f)
+			r = 0.1f;
 
-	camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
-	camY = r *   						     sin(beta * 3.14f / 180.0f);
+		camX = r * sin(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
+		camZ = r * cos(alpha * 3.14f / 180.0f) * cos(beta * 3.14f / 180.0f);
+		camY = r *   						     sin(beta * 3.14f / 180.0f);
 	
 	}
 //  uncomment this if not using an idle func
@@ -741,6 +746,24 @@ void GameManager::renderScene(void) {
 			float auxCenterX = auxCarX + (5.0f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
 			float auxCenterY = 3.0f;
 			float auxCenterZ = auxCarZ + (5.0f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f) + 3.14));
+
+			camX = auxCenterX;
+			camY = auxCenterY;
+			camZ = auxCenterZ;
+			if(tracking == 0) {
+				atX = auxCarX;
+				atY = auxCarY;
+				atZ = auxCarZ;
+			}
+
+			lookAt(camX, camY, camZ, atX, atY, atZ, 0.0, 1.0, 0.0);
+		}else if(camS == 4){
+			float auxCenterX = _gameObject[8]->getPosition()->getX() + (0.5f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f)));
+			float auxCenterY = _gameObject[8]->getPosition()->getY() + 1.2f;
+			float auxCenterZ = _gameObject[8]->getPosition()->getZ() + (0.5f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f)));
+			float auxCarX = auxCenterX + (5.0f * cos((-_gameObject[8]->getAngle() * 3.14f / 180.0f)));
+			float auxCarY = 0.0f;
+			float auxCarZ = auxCenterZ + (5.0f * sin((-_gameObject[8]->getAngle() * 3.14f / 180.0f)));
 
 			camX = auxCenterX;
 			camY = auxCenterY;
@@ -802,8 +825,11 @@ void GameManager::renderScene(void) {
 		glBindTexture(GL_TEXTURE_2D, TextureArray[10]);
 
 		glActiveTexture(GL_TEXTURE11);
-
 		glBindTexture(GL_TEXTURE_2D, TextureArray[11]);
+		
+		glActiveTexture(GL_TEXTURE12);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[12]);
+
 
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
@@ -818,6 +844,7 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc9, 9);
 		glUniform1i(tex_loc10, 10);
 		glUniform1i(tex_loc11, 11);
+		glUniform1i(tex_loc12, 12);
 		
 		//Draw the lights
 		for(size_t i = 0; i < _lights.size(); i++) {
@@ -861,12 +888,13 @@ void GameManager::renderScene(void) {
 		objId = 14;
 		_gameObject[13]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-		// ----------------- STENCIL --------------------
-		
+		// ----------------- STENCIL RUBIK CUBE --------------------
+	
 			//------------------- RUBIK ------------------------------------
 
 			objId = 16;
 			_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+
 		glEnable(GL_BLEND);
 		glEnable(GL_STENCIL_TEST);
 		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
@@ -877,29 +905,58 @@ void GameManager::renderScene(void) {
 
 			// Draw coaster
 			objId=15;
+			pushMatrix(MODEL);
+			translate(MODEL, 0.5f, 0.0f, -2.5f);
+			scale(MODEL, 4.0f, 0.5f, 4.0f);
 			_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			popMatrix(MODEL);
 
 			// Draw rubik cube reflection
-            glStencilFunc(GL_EQUAL, 1, 0xFF);
+           glStencilFunc(GL_EQUAL, 1, 0xFF);
             glStencilMask(0x00);
             glDepthMask(GL_TRUE);
 
 			objId=16;
 			pushMatrix(MODEL);
-			
-			//rotate(MODEL,90, 0.0f, 0.0f, 1.0f);
-			//rotate(MODEL,90, 0.0f, 0.0f, 1.0f);
-			//rotate(MODEL,180, 0.0f, 0.0f, 1.0f);
-			translate(MODEL, 0.0f, -2.9f, 0.0f);
-			_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			translate(MODEL, 0.0f, -3.0f, 0.0f);
+			_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			popMatrix(MODEL);
-
+			
 		glDisable(GL_STENCIL_TEST);
 		glDisable(GL_BLEND);
 
+		// ----------------- STENCIL PARABRISAS --------------------
+/*
+		glEnable(GL_BLEND);
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilMask(0xFF); // Write to stencil buffer
+		glDepthMask(GL_FALSE); // Don't write to depth buffer
+		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+
+			// Draw coaster
+			objId=15;
+			pushMatrix(MODEL);
+			translate(MODEL, _gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY(), _gameObject[8]->getPosition()->getZ());
+			rotate(MODEL, _gameObject[8]->getAngle(), 0.0f, 1.0f, 0.0f);
+			scale(MODEL, 1.0f, 0.1f, 0.0f);
+			_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			popMatrix(MODEL);
+
+			// Draw rubik cube reflection
+           glStencilFunc(GL_EQUAL, 1, 0xFF);
+            glStencilMask(0x00);
+            glDepthMask(GL_TRUE);
+
+			_cameras[4]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+			
+		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_BLEND);
+		*/
 
 	//---------------------------------BILLBOARD --------------------------------------
-	/*	float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+	float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 	// use our shader
 	glUseProgram(shader.getProgramIndex());
 
@@ -911,8 +968,8 @@ void GameManager::renderScene(void) {
 	
 	glUniform1i(texMode_uniformId, 9); // to use phong color
 		objId=17;
-		_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			*/
+		_gameObject[17]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			
 	//-----------------------------------------------------------------------------------
 
 		// ----------------- BLENDING (GLASS) ---------------------
@@ -1008,6 +1065,7 @@ GLuint GameManager::setupShaders() {
 	tex_loc9 = glGetUniformLocation(shader.getProgramIndex(), "texmap9");
 	tex_loc10 = glGetUniformLocation(shader.getProgramIndex(), "texmap10");
 	tex_loc11 = glGetUniformLocation(shader.getProgramIndex(), "texmap11");
+	tex_loc12 = glGetUniformLocation(shader.getProgramIndex(), "texmap12");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -1036,7 +1094,7 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(11, TextureArray);
+	glGenTextures(15, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
@@ -1049,10 +1107,11 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "tree.tga", 9);
 	TGA_Texture(TextureArray, "juice.tga", 10);
 	TGA_Texture(TextureArray, "rubik.tga", 11);
+	TGA_Texture(TextureArray, "rubik2.tga", 12);
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<17; auxId++, objId++){
+	for(auxId=0; auxId<18; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);

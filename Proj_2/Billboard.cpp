@@ -6,10 +6,16 @@ extern float mCompMatrix[COUNT_COMPUTED_MATRICES][16];
 extern float mNormal3x3[9];
 
 //constructor of the Billboard
-Billboard::Billboard(){}
+Billboard::Billboard(){
+	
+}
 
 //destructor of the Billboard
 Billboard::~Billboard(){}
+
+void Billboard::setReflection(int reflection){
+	_reflection = reflection;
+}
 
 //_____________________________________Get and Set__________________________________________
 
@@ -54,7 +60,7 @@ float Billboard::getPosZ(){
 void Billboard::create(struct MyMesh* mesh, int *objId){
 
 	float spec[] = {0.9f, 0.9f, 0.9f, 1.0f};
-	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
+	float emissive[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float shininess= 1000.0f;
 	int texcount = 0;
 		
@@ -110,7 +116,7 @@ void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 		computeNormalMatrix3x3();
 		glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
 
-		//glUniform1i(texMode_uniformId, 9); // multitexturing
+		glUniform1i(texMode_uniformId,13); // multitexturing
 
 		glBindVertexArray(mesh[*objId].vao);
 		glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);

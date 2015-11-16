@@ -13,6 +13,7 @@ uniform sampler2D texmap8;
 uniform sampler2D texmap9;
 uniform sampler2D texmap10;
 uniform sampler2D texmap11;
+uniform sampler2D texmap12;
 
 uniform int isCarLife;
 
@@ -204,7 +205,19 @@ void main() {
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
-	/*else if (texMode == 12)  {  // tree texture for billboard
+	else if(texMode == 12) // modulate diffuse color with texel color
+	{
+		texel = vec3(texture(texmap12, DataIn.tex_coord));  // texel from candle.tga
+		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
+	}
+	else if(texMode == 13) // modulate diffuse color with texel color
+	{
+		texel = vec3(texture(texmap9, DataIn.tex_coord));  // texel from candle.tga
+		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
+		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
+	}
+	/*else if (texMode == 13)  {  // tree texture for billboard
 		texel = texture(texmap, DataIn.tex_coord);  		if(texel.a == 0.0) discard;
 		else
 			colorOut = vec4(max(intensity*texel.rgb + spec, 0.1*texel.rgb), texel.a);

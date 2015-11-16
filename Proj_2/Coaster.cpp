@@ -50,8 +50,8 @@ void Coaster::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformI
 	loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
 	glUniform1f(loc,mesh[*objId].mat.shininess);
 	pushMatrix(MODEL);
-	translate(MODEL, 0.5f, 0.0f, -2.5f);
-	scale(MODEL, 4.0f, 0.5f, 4.0f);
+	//	translate(MODEL, 0.5f, 0.0f, -2.5f);
+	//scale(MODEL, 4.0f, 0.5f, 4.0f);
 	
 
 	// send matrices to OGL
