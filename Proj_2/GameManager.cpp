@@ -99,6 +99,7 @@ Juice* juice;
 Rubik* rubik;
 Rubik* rubik2;
 Pot* pot;
+Sun* sun;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
@@ -158,6 +159,8 @@ GameManager::GameManager(){
 
 	pot = new Pot();
 	_gameObject.push_back(pot); //pot = 18
+	sun = new Sun();
+	_gameObject.push_back(sun); //sun  = 19
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
@@ -907,6 +910,9 @@ void GameManager::renderScene(void) {
 		objId = 18;
 		_gameObject[18]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
+		objId = 19;
+		_gameObject[19]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+
 		//------------------- JUICE ------------------------------------
 
 		objId = 14;
@@ -1131,7 +1137,7 @@ void GameManager::init(){
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<19; auxId++, objId++){
+	for(auxId=0; auxId<20; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);

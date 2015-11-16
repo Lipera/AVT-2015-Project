@@ -196,19 +196,19 @@ void main() {
 	}
 	else if(texMode == 10) // modulate diffuse color with texel color
 	{
-		texel = vec3(texture(texmap10, DataIn.tex_coord));  // texel from candle.tga
+		texel = vec3(texture(texmap10, DataIn.tex_coord));  // texel from juice.tga
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
 	else if(texMode == 11) // modulate diffuse color with texel color
 	{
-		texel = vec3(texture(texmap11, DataIn.tex_coord));  // texel from candle.tga
+		texel = vec3(texture(texmap11, DataIn.tex_coord));  // texel from rubik.tga
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
 	else if(texMode == 12) // modulate diffuse color with texel color
 	{
-		texel = vec3(texture(texmap12, DataIn.tex_coord));  // texel from candle.tga
+		texel = vec3(texture(texmap12, DataIn.tex_coord));  // texel from rubik2.tga
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
@@ -218,6 +218,10 @@ void main() {
 		else{
 			colorOut += vec4(max(scatteredLight * texel4.rgb + reflectedLight, 0.1*texel4.rgb), texel4.w);
 			}
+	}else if(texMode == 14) // modulate just material (sun)
+	{
+		colorOut += vec4(max(scatteredLight + reflectedLight, vec3(mat.ambient)), mat.diffuse.w);
+		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
 
 

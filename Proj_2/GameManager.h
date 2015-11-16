@@ -27,6 +27,7 @@
 #include "Juice.h"
 #include "Rubik.h"
 #include "Pot.h"
+#include "Sun.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
