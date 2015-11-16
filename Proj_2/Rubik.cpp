@@ -32,14 +32,25 @@ void Rubik::create(struct MyMesh* mesh, int *objId){
 	float diff[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	float spec[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
+	float amb1[]= {0.2f, 0.2f, 0.2f, 0.5f};
+	float diff1[] = {1.0f, 1.0f, 1.0f, 0.5f};
+	float spec1[] = {1.0f, 1.0f, 1.0f, 0.5f};
+
 	float emissive[] = {0.5f, 0.5f, 0.5f, 1.0f};
 	float shininess= 300.0f;
 	int texcount = 0;
 
 	*objId=16;
-	memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
-	memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
-	memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
+
+	if(getRubikStencil()==0){
+		memcpy(mesh[*objId].mat.ambient, amb,4*sizeof(float));
+		memcpy(mesh[*objId].mat.diffuse, diff,4*sizeof(float));
+		memcpy(mesh[*objId].mat.specular, spec,4*sizeof(float));
+	}else if (getRubikStencil()==1){
+		memcpy(mesh[*objId].mat.ambient, amb1,4*sizeof(float));
+		memcpy(mesh[*objId].mat.diffuse, diff1,4*sizeof(float));
+		memcpy(mesh[*objId].mat.specular, spec1,4*sizeof(float));
+	}
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;

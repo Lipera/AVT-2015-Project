@@ -916,11 +916,17 @@ void GameManager::renderScene(void) {
             glStencilMask(0x00);
             glDepthMask(GL_TRUE);
 
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0);
 			objId=16;
 			pushMatrix(MODEL);
 			translate(MODEL, 0.0f, -3.0f, 0.0f);
 			_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			popMatrix(MODEL);
+		glDisable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
 			
 		glDisable(GL_STENCIL_TEST);
 		glDisable(GL_BLEND);
@@ -956,17 +962,17 @@ void GameManager::renderScene(void) {
 		*/
 
 	//---------------------------------BILLBOARD --------------------------------------
-	float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
+	//float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
 	// use our shader
-	glUseProgram(shader.getProgramIndex());
+	//glUseProgram(shader.getProgramIndex());
 
 	//Associar os Texture Units aos Objects Texture
 	//tree.tga loaded in TU0; 
-	float res[4];
-	multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
-	glUniform4fv(lPos_uniformId, 1, res);
+	//float res[4];
+	//multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
+	//glUniform4fv(lPos_uniformId, 1, res);
 	
-	glUniform1i(texMode_uniformId, 9); // to use phong color
+	//glUniform1i(texMode_uniformId, 9); // to use phong color
 		objId=17;
 		_gameObject[17]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			

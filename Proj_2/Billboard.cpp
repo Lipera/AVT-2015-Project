@@ -60,7 +60,7 @@ float Billboard::getPosZ(){
 void Billboard::create(struct MyMesh* mesh, int *objId){
 
 	float spec[] = {0.9f, 0.9f, 0.9f, 1.0f};
-	float emissive[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	float emissive[] = {0.0f, 0.0f, 0.0f, 1.0f};
 	float shininess= 1000.0f;
 	int texcount = 0;
 		
@@ -86,7 +86,7 @@ void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-		glUniform1i(texMode_uniformId, 6); // draw textured quads
+		glUniform1i(texMode_uniformId, 9); // draw textured quads
 	
 		pushMatrix(MODEL);
 		translate(MODEL,5,0,5);
