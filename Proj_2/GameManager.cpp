@@ -98,6 +98,7 @@ Coaster* coaster;
 Juice* juice;
 Rubik* rubik;
 Rubik* rubik2;
+Pot* pot;
 //--------------------------------------Constructor and Destructor--------------------------------------
 
 GameManager::GameManager(){
@@ -153,7 +154,10 @@ GameManager::GameManager(){
 	_gameObject.push_back(rubik2); //rubik = 16
 	//billboard
 	b = new Billboard();
-	_gameObject.push_back(b); //billboard=17
+	_gameObject.push_back(b); //billboard = 17
+
+	pot = new Pot();
+	_gameObject.push_back(pot); //pot = 18
 
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
@@ -591,7 +595,21 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 			keyA = true;
 			car->setAceleracao(-0.00075f);
             break;
-	}
+	
+		case 'T':
+		case 't':
+			int aux = b->getType();
+			aux = aux++;
+			b->setType(aux);
+			if (b->getType() == 5){ b->setType(0);}
+				switch(b->getType()) {
+					case 0: printf("Cheating Spherical (matrix reset)\n"); break;
+					case 1: printf("Cheating Cylindrical (matrix reset)\n"); break;
+					case 2: printf("True Spherical\n"); break;
+					case 3: printf("True Cylindrical\n"); break;
+					case 4: printf("No billboarding\n"); break;
+				}
+}
 }
 
 void GameManager::processKeysUp(unsigned char key, int xx, int yy){
@@ -883,6 +901,12 @@ void GameManager::renderScene(void) {
 			_track[cheerioId]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		}
 		
+
+		//------------------- POT ------------------------------------
+
+		objId = 18;
+		_gameObject[18]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+
 		//------------------- JUICE ------------------------------------
 
 		objId = 14;
@@ -962,17 +986,7 @@ void GameManager::renderScene(void) {
 		*/
 
 	//---------------------------------BILLBOARD --------------------------------------
-	//float lightPos[4] = {4.0f, 6.0f, 2.0f, 1.0f};
-	// use our shader
-	//glUseProgram(shader.getProgramIndex());
 
-	//Associar os Texture Units aos Objects Texture
-	//tree.tga loaded in TU0; 
-	//float res[4];
-	//multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
-	//glUniform4fv(lPos_uniformId, 1, res);
-	
-	//glUniform1i(texMode_uniformId, 9); // to use phong color
 		objId=17;
 		_gameObject[17]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 			
@@ -1117,7 +1131,7 @@ void GameManager::init(){
 
 	int auxId;
 	objId = 0;
-	for(auxId=0; auxId<18; auxId++, objId++){
+	for(auxId=0; auxId<19; auxId++, objId++){
 		if(auxId==3 || auxId==4 || auxId==5){
 			objId=2;
 			_gameObject[auxId]->create(mesh, &objId);

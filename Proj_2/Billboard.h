@@ -18,6 +18,7 @@ private:
 	float _posY;
 	float _posZ;
 	int _reflection;
+	int _type;
 
 public:
 	Billboard();
@@ -31,6 +32,8 @@ public:
 	float getPosY();
 	float getPosZ();
 	void setPos(float posX, float posY, float posZ);
+	void setType(int i);
+	int getType();
 	//void l3dBillboardGetRightVector(float *right);
 	//void l3dBillboardGetUpRightVector(float *up, float *right);
 	void l3dBillboardLocalToWorld(float *cam, float *worldPos);

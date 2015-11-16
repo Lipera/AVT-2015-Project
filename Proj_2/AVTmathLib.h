@@ -13,6 +13,7 @@
 #ifndef __AVTmathLib__
 #define __AVTmathLib__
 
+
 #include <vector>
 #include <string>
 #include <GL/glew.h>
@@ -141,6 +142,16 @@
 		*/
 		float *get(MatrixTypes aType);
 
+
+
+		/** Similar to glGet for computed matrices
+		  *
+		  * \param aType any value from ComputedMatrixTypes
+		  * \returns pointer to the matrix (float[16] or float[9])
+		*/
+		float *get(ComputedMatrixTypes aType);
+
+
 		void multMatrixPoint(MatrixTypes aType, float *point, float *res);
 
 
@@ -191,4 +202,7 @@
 		
 		/// Computes Derived Matrices (4x4)
 		void computeDerivedMatrix(ComputedMatrixTypes aType);
+
+		///It calculates only the PVM matrix. Just an auxiliary function to be used in billboad demo: it implies that VIEW_MODEL was already calculated
+		void computeDerivedMatrix_PVM();
 #endif

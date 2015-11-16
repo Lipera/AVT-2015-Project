@@ -71,6 +71,7 @@ void main() {
 	int i;
 
 	vec3 texel, texel1;
+	vec4 texel4;
 
 	//Textures where the light contribution is not taken into account
 	if(texMode == 4) // texel color
@@ -211,17 +212,13 @@ void main() {
 		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
-	else if(texMode == 13) // modulate diffuse color with texel color
-	{
-		texel = vec3(texture(texmap9, DataIn.tex_coord));  // texel from candle.tga
-		colorOut += vec4(max(scatteredLight * texel + reflectedLight, 0.1*texel), mat.diffuse.w);
-		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
+	else if (texMode == 13)  {  // tree texture for billboard
+		texel4 = texture(texmap9, DataIn.tex_coord);  		
+		if(texel4.w == 0.0f) discard;
+		else{
+			colorOut += vec4(max(scatteredLight * texel4.rgb + reflectedLight, 0.1*texel4.rgb), texel4.w);
+			}
 	}
-	/*else if (texMode == 13)  {  // tree texture for billboard
-		texel = texture(texmap, DataIn.tex_coord);  		if(texel.a == 0.0) discard;
-		else
-			colorOut = vec4(max(intensity*texel.rgb + spec, 0.1*texel.rgb), texel.a);
-	}*/
 
 
 	//----------------------------------------FOG -------------------------------------------------

@@ -7,7 +7,7 @@ extern float mNormal3x3[9];
 
 //constructor of the Billboard
 Billboard::Billboard(){
-	
+	setType(1);
 }
 
 //destructor of the Billboard
@@ -55,6 +55,14 @@ float Billboard::getPosZ(){
 	return _posZ;
 }
 
+void Billboard::setType(int i){
+	_type=i;
+}
+
+int Billboard::getType(){
+	return _type;
+}
+
 //___________________________________________________________________________________________
 
 void Billboard::create(struct MyMesh* mesh, int *objId){
@@ -74,57 +82,74 @@ void Billboard::create(struct MyMesh* mesh, int *objId){
 }
 
 void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
+		
 	float modelview[16];
-		float pos[3];
-		//pos[0] = getPosX(); pos[1] = getPosY(); pos[2] = getPosZ();
-		pos[0] = 5.0; pos[1] = 0.0; pos[2] = 5.0;
-		float cam[3];
-		cam[0] = getCamX(); cam[1] = getCamY(); cam[2] = getCamZ();
+	float pos[3];
+	//pos[0] = getPosX(); pos[1] = getPosY(); pos[2] = getPosZ();
+	float cam[3];
+	cam[0] = getCamX(); cam[1] = getCamY(); cam[2] = getCamZ();
+	GLint loc;
 
-		 //Draw trees billboards
+	//Draw trees billboards
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-		glUniform1i(texMode_uniformId, 9); // draw textured quads
-	
-		pushMatrix(MODEL);
-		translate(MODEL,5,0,5);
+    glUniform1i(texMode_uniformId, 1); // draw textured quads
 
-	
-		*objId=17;  //quad for tree
-		GLint loc;
+        for(int j = 1; j < 3; j++) {
+            pushMatrix(MODEL);
+            translate(MODEL,-7.0,0.0,-10.0+j*5);
 
-		//diffuse and ambient color are not used in the tree quads
-		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
-		glUniform4fv(loc, 1, mesh[*objId].mat.specular);
-		loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
-		glUniform1f(loc,mesh[*objId].mat.shininess);
-	
-		pushMatrix(MODEL);
-		translate(MODEL, 0.0, 3.0, 0.0f);
+           pos[0] = -7.0; pos[1] = 0; pos[2] = -10.0+j*5;
 
-		computeDerivedMatrix(VIEW_MODEL);
-		memcpy(modelview, mCompMatrix[VIEW_MODEL], sizeof(float) * 16);
+            if (getType() == 2){
+                l3dBillboardSphericalBegin(cam,pos);
+			}
+            else if (getType() == 3){
+                l3dBillboardCylindricalBegin(cam,pos);
+			}
+    
+            *objId=17;  //quad for tree
 
-		l3dBillboardCylindricalBegin(cam,pos);
+            //diffuse and ambient color are not used in the tree quads
+            loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+            glUniform4fv(loc, 1, mesh[*objId].mat.specular);
+            loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+            glUniform1f(loc,mesh[*objId].mat.shininess);
+    
+            pushMatrix(MODEL);
+            translate(MODEL, 0.0, 3.0, 0.0f);
+  
+            // send matrices to OGL
+            if (getType() == 0 || getType() == 1) {     //Cheating matrix reset billboard techniques
+                computeDerivedMatrix(VIEW_MODEL);
+                memcpy(modelview, mCompMatrix[VIEW_MODEL], sizeof(float) * 16);  //save VIEW_MODEL in modelview matrix
 
-		//computeDerivedMatrix_PVM();
+                //reset VIEW_MODEL
+                if(getType()==0){
+					BillboardCheatSphericalBegin();   
+				}
+                else{
+					BillboardCheatCylindricalBegin();
+				}
 
-		glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
-		glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
-		computeNormalMatrix3x3();
-		glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+                computeDerivedMatrix_PVM(); // calculate PROJ_VIEW_MODEL
+            }
+            else computeDerivedMatrix(PROJ_VIEW_MODEL);
 
-		glUniform1i(texMode_uniformId,13); // multitexturing
+			glUniform1i(texMode_uniformId, 13);
 
-		glBindVertexArray(mesh[*objId].vao);
-		glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
-		popMatrix(MODEL);
-			
-		//	if (type==0 || type==1) // restore matrix   
-		//	BillboardEnd(modelview);   // não é necessário pois a PVM é sempre calculada a pArtir da MODEL e da VIEW que não são ALTERADAS
-		popMatrix(MODEL);
+            glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+            glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+            computeNormalMatrix3x3();
+            glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+            glBindVertexArray(mesh[*objId].vao);
+            glDrawElements(mesh[*objId].type,mesh[*objId].numIndexes, GL_UNSIGNED_INT, 0);
+            popMatrix(MODEL);
+
+            popMatrix(MODEL);
+        }
 		
 }
 
