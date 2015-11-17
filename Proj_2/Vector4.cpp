@@ -10,6 +10,12 @@ Vector4::Vector4(float x, float y, float z, float w){
     _xyz = new Vector3(x, y, z);
 }
 
+Vector4::Vector4(Vector3* xyz, float w){
+	_w = w;
+    _xyz = xyz;
+}
+
+
 Vector4::~Vector4(){
 	delete _xyz;
 }

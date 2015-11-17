@@ -28,6 +28,7 @@
 #include "Rubik.h"
 #include "Pot.h"
 #include "Sun.h"
+#include "Particle.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -47,6 +48,9 @@
 //-----------------------------------defines--------------------------------
 #define CAPTION "MicroMachine"
 #define FPS 60
+#define frand()			((float)rand()/RAND_MAX)
+#define M_PI			3.14159265
+#define MAX_PARTICULAS  1500
 //---------------------------------------------------------------------------
 
 #ifndef GAMEMANAGER_H
@@ -64,6 +68,7 @@ private:
 	std::vector<GameObject*> _lives;
 	std::vector<GameObject*> _track;
 	std::vector<LightSource*> _lights;
+	std::vector<Particle*> _particles;
 
 public:
     GameManager();
@@ -84,7 +89,9 @@ public:
 	void processMouseMotion(int xx, int yy);
 	void mouseWheel(int wheel, int direction, int x, int y);
 	void renderScene();
-    void init();
+	void init();
+	void initParticles();
+	void iterate(int value);
 	void timer(int value);
 	GLuint setupShaders();
 	bool collision(GameObject *obj1, GameObject *obj2, Vector3 *obj1_position, Vector3 *obj2_position);

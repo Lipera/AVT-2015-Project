@@ -12,6 +12,7 @@ private:
 public:
     Vector4();
 	Vector4(float x, float y, float z, float w);
+	Vector4(Vector3* xyz, float w);
     ~Vector4();
 	float getX();
 	float getY();

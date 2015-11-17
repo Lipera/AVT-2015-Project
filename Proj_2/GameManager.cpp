@@ -18,6 +18,8 @@ int time = 0;
 bool play = true;
 bool restart = false;
 bool gameOver = false;
+bool particles = false;
+float particle_color[4];
 
 // Camera
 // Camera Position
@@ -162,10 +164,17 @@ GameManager::GameManager(){
 	sun = new Sun();
 	_gameObject.push_back(sun); //sun  = 19
 
+	//Lives
 	int i;
 	for (i = 0; i < INITIAL_LIVES; i++) {
 		_lives.push_back(new Car(0.0f, 0.0f, 0.0f, 1));
 		((Car *)_lives[i])->setPosition(-20.0f + (i * 3.0f), 20.0f, 0.0f);
+	}
+
+	//Particles
+	int j;
+	for (j = 0; j<MAX_PARTICULAS; j++){
+		_particles.push_back(new Particle());
 	}
 
 //--------------------------------------Track------------------------------------
@@ -195,15 +204,16 @@ GameManager::GameManager(){
 	float spotDirY = 0.0f;
 	float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ + 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ - 0.2f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light7);
-	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 3.0f, carY - 0.5f, carZ - 0.5f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
+	LightSource *light8 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.0f, carY + 0.2f, carZ + 0.8f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light8);
 
 	//Fog
 	_isFogActive = false;
 }
 
+//Organize the track
 void GameManager::track(){
 	int aux;
 	int aux2 = 0;
@@ -355,6 +365,31 @@ void GameManager::reshape(int w, int h) {
 
 }
 
+//-------------------------------------Iterator of particles---------------------------
+
+void GameManager::iterate(int value)
+{
+	int i;
+	float h;
+
+	/* Método de Euler de integração de eq. diferenciais ordinárias
+	h representa o step de tempo; dv/dt = a; dx/dt = v; e conhecem-se os valores iniciais de x e v */
+
+	h = 0.125f;
+	for (i = 0; i<MAX_PARTICULAS; i++)
+	{/*
+		particula[i].x += (h*particula[i].vx);
+		particula[i].y += (h*particula[i].vy);
+		particula[i].z += (h*particula[i].vz);
+		particula[i].vx += (h*particula[i].ax);
+		particula[i].vy += (h*particula[i].ay);
+		particula[i].vz += (h*particula[i].az);
+		particula[i].life -= particula[i].fade;*/
+	}
+	glutPostRedisplay();
+	//glutTimerFunc(33, iterate, 0);
+}
+
 // -------------------------------------Timer--------------------------------------------
 
 void GameManager::timer(int value){
@@ -375,8 +410,15 @@ void GameManager::timer(int value){
 		float spotDirY = 0.0f;
 		float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() + (0.5f * spotDirZ), 1.0f));
-		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (3.0f * spotDirX), _gameObject[8]->getPosition()->getY() - 0.5f, _gameObject[8]->getPosition()->getZ() - (0.5f * spotDirZ), 1.0f));
+		/*
+		Vector4 right_headlight = new Vector4(0.5f, 0.0f, 0.2f, 0.0f);
+		Vector4 left_headlight = new Vector4(0.5f, 0.0f, -0.2f, 0.0f);
+		Vector4 car_pos = new Vector4(_gameObject[8]->getPosition(), 1.0f);
+		Vector4 vec_dir = new Vector4(spotDirX, spotDirY, spotDirZ, 1.0f);
+		*/
+
+		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() - 0.2f, 1.0f));
+		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX(), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + 0.8f, 1.0f));
 
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
@@ -538,6 +580,11 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 			if(play){
 				_isFogActive = !_isFogActive;
 			}
+			break;
+		case 'K':
+		case 'k':
+			particles = true;
+			initParticles();
 			break;
 
 		case '1':	if(play){
@@ -918,6 +965,57 @@ void GameManager::renderScene(void) {
 		objId = 14;
 		_gameObject[13]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
+		//--------------------------------------------------------------
+
+		//-----------------------------------------PARTICLES---------------------------------------------
+		if (particles){
+
+			glBindTexture(GL_TEXTURE_2D, TextureArray[1]);
+			glDisable(GL_DEPTH_TEST); // não interessa o z-buffer: as partículas podem ser desenhadas umas por cima das outras sem problemas de ordenação 
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+					GLint loc;
+
+			// draw fireworks particles
+			objId = 20;  //quad for particle
+
+			glUniform1i(texMode_uniformId, 2); // draw modulated textured particles 
+
+			for (int i = 0; i < MAX_PARTICULAS; i++) {
+
+				if (_particles[i]->getLife() > 0.0f){ // só desenha as que ainda estão vivas
+
+					// A vida da partícula representa o canal alpha da cor. Como o blend está activo a cor final é a soma da cor rgb do fragmento multiplicada pelo
+					//alpha com a cor do pixel destino 
+					particle_color[0] = _particles[i]->getColor().getX();
+					particle_color[1] = _particles[i]->getColor().getY();
+					particle_color[2] = _particles[i]->getColor().getZ();
+					particle_color[3] = _particles[i]->getLife();
+
+					// send the material - diffuse color modulated with texture
+					loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+					glUniform4fv(loc, 1, particle_color);
+
+					pushMatrix(MODEL);
+					translate(MODEL, _particles[i]->getPosition().getX(), _particles[i]->getPosition().getY(), _particles[i]->getPosition().getZ());
+
+					// send matrices to OGL
+					computeDerivedMatrix(PROJ_VIEW_MODEL);
+					glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+					glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+					computeNormalMatrix3x3();
+					glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+					glBindVertexArray(mesh[objId].vao);
+					glDrawElements(mesh[objId].type, mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+					popMatrix(MODEL);
+				}
+			}
+		}
+
+		//------------------------------------------------------------------------------------------------
+
 		// ----------------- STENCIL RUBIK CUBE --------------------
 	
 			//------------------- RUBIK ------------------------------------
@@ -1102,6 +1200,32 @@ GLuint GameManager::setupShaders() {
 // Model loading and OpenGL setup
 //----------------------------------------------------------------------------------------
 
+//------------------------INIT PARTICLES-------------------------------
+
+void GameManager::initParticles(){
+	
+	GLfloat v, theta, phi;
+	int i;
+	
+	for (i = 0; i<MAX_PARTICULAS; i++)
+	{
+		v = 0.8*frand() + 0.2;
+		phi = frand()*M_PI;
+		theta = 2.0*frand()*M_PI;
+
+		_particles[i]->setPosition(0.0f, 10.0f, 0.0f);
+		_particles[i]->setSpeed(v * cos(theta) * sin(phi), v * cos(phi), v * sin(theta) * sin(phi));
+		_particles[i]->setAcceleration(0.1f, -0.15f, 0.0f);
+		_particles[i]->setColor(0.882f, 0.552f, 0.211f);
+		_particles[i]->setLife(1.0f);
+		_particles[i]->setFade(0.005f);
+	}
+}
+
+
+
+
+
 // ------------------------------Init Function------------------------------
 
 void GameManager::init(){
@@ -1145,6 +1269,12 @@ void GameManager::init(){
 		_gameObject[auxId]->create(mesh, &objId);
 	}
 
+	int auxId2;
+	objId = 20;
+	for (auxId2 = 0; auxId2<MAX_PARTICULAS; auxId2++){
+		_particles[auxId2]->create(mesh, &objId);
+	}
+	initParticles();
 	
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);
