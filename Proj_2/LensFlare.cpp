@@ -40,6 +40,12 @@ void LensFlare::create(struct MyMesh* mesh, int *objId){
 
 void LensFlare::render_flare(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId){
 	GLint loc;
+	
+	//Disable depth buffer to draw in front of everything
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	*objId=19;
 	// send the material
@@ -71,4 +77,8 @@ void LensFlare::render_flare(struct MyMesh* mesh, VSShaderLib& shader, GLint& pv
 	glBindVertexArray(0);
 
 	popMatrix(MODEL);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 }
