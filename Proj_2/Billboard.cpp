@@ -150,6 +150,7 @@ void Billboard::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 
             popMatrix(MODEL);
         }
+		glDisable(GL_BLEND);
 		
 }
 
