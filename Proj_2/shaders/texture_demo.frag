@@ -14,6 +14,7 @@ uniform sampler2D texmap9;
 uniform sampler2D texmap10;
 uniform sampler2D texmap11;
 uniform sampler2D texmap12;
+uniform sampler2D texmap13;
 
 uniform int isCarLife;
 
@@ -218,12 +219,17 @@ void main() {
 		else{
 			colorOut += vec4(max(scatteredLight * texel4.rgb + reflectedLight, 0.1*texel4.rgb), texel4.w);
 			}
-	}else if(texMode == 14) // modulate just material (sun)
+	}
+	else if(texMode == 14) // modulate just material (sun)
 	{
 		colorOut += vec4(max(scatteredLight + reflectedLight, vec3(mat.ambient)), mat.diffuse.w);
 		//colorOut += max(att * (intensity*lights[i].diffuse*texel + spec), 0.1*texel);
 	}
-
+	else if(texMode == 15) // modulate diffuse color with texel color
+	{
+		texel4 = texture(texmap13, DataIn.tex_coord);  // texel from particula.bmp
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+	}
 
 	//----------------------------------------FOG -------------------------------------------------
 

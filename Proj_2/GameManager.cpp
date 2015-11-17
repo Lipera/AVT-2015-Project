@@ -41,7 +41,7 @@ unsigned int FrameCount = 0;
 
 VSShaderLib shader;
 
-struct MyMesh mesh[30];
+struct MyMesh mesh[25];
 int objId=0; //id of the object mesh - to be used as index of mesh: mesh[objID] means the current mesh
 
 //External array storage defined in AVTmathLib.cpp
@@ -58,7 +58,7 @@ GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
-GLint tex_loc11, tex_loc12;
+GLint tex_loc11, tex_loc12, tex_loc13;
 GLint texMode_uniformId;
 
 GLuint TextureArray[15];
@@ -203,7 +203,6 @@ GameManager::GameManager(){
 	float spotDirX = cos((-_gameObject[8]->getAngle() * PI / 180.0f));
 	float spotDirY = 0.0f;
 	float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
-
 
 	LightSource *light7 = (LightSource*) new LightSource(new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(1.0f,1.0f,1.0f,1.0f), new Vector4(carX + 0.5f, carY + 0.2f, carZ - 0.2f, 1.0f), 0.02f, 0.02f, 0.02f, 25.0f, 0.0f, new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 	_lights.push_back(light7);
@@ -368,33 +367,54 @@ void GameManager::reshape(int w, int h) {
 
 //-------------------------------------Iterator of particles---------------------------
 
-void GameManager::iterate(int value)
-{
+void GameManager::iterate(int value){
 	int i;
 	float h;
 
 	/* Método de Euler de integração de eq. diferenciais ordinárias
 	h representa o step de tempo; dv/dt = a; dx/dt = v; e conhecem-se os valores iniciais de x e v */
-
 	h = 0.125f;
-	for (i = 0; i<MAX_PARTICULAS; i++)
-	{/*
-		particula[i].x += (h*particula[i].vx);
-		particula[i].y += (h*particula[i].vy);
-		particula[i].z += (h*particula[i].vz);
-		particula[i].vx += (h*particula[i].ax);
-		particula[i].vy += (h*particula[i].ay);
-		particula[i].vz += (h*particula[i].az);
-		particula[i].life -= particula[i].fade;*/
+	for (i = 0; i<MAX_PARTICULAS; i++) {
+
+		float life = _particles[i]->getLife();
+		float fade = _particles[i]->getFade();
+		Vector3 position = _particles[i]->getPosition();
+		Vector3 speed = _particles[i]->getSpeed();
+		Vector3 acceleration = _particles[i]->getAcceleration();
+
+		float x = position.getX();
+		x += h*(speed.getX());
+		float y = position.getY();
+		y += h*(speed.getY());
+		float z = position.getZ();
+		z += h*(speed.getZ());
+
+		_particles[i]->setPosition(x, y, z);
+
+		float vx = speed.getX();
+		vx += h*(acceleration.getX());
+		float vy = speed.getY();
+		vy += h*(acceleration.getY());
+		float vz = speed.getZ();
+		vz += h*(acceleration.getZ());
+
+		_particles[i]->setSpeed(vx, vy, vz);
+		
+		float l = life;
+		l -= fade;
+
+		_particles[i]->setLife(l);
+
 	}
-	glutPostRedisplay();
-	//glutTimerFunc(33, iterate, 0);
+	
 }
 
 // -------------------------------------Timer--------------------------------------------
 
 void GameManager::timer(int value){
 	
+	iterate(0);
+
 	int deltaTime;
     
     int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
@@ -899,6 +919,9 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE12);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[12]);
 
+		glActiveTexture(GL_TEXTURE13);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[13]);
+
 
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
@@ -914,6 +937,7 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc10, 10);
 		glUniform1i(tex_loc11, 11);
 		glUniform1i(tex_loc12, 12);
+		glUniform1i(tex_loc13, 13);
 		
 		//Draw the lights
 		for(size_t i = 0; i < _lights.size(); i++) {
@@ -968,55 +992,6 @@ void GameManager::renderScene(void) {
 
 		//--------------------------------------------------------------
 
-		//-----------------------------------------PARTICLES---------------------------------------------
-		if (particles){
-
-			glBindTexture(GL_TEXTURE_2D, TextureArray[1]);
-			glDisable(GL_DEPTH_TEST); // não interessa o z-buffer: as partículas podem ser desenhadas umas por cima das outras sem problemas de ordenação 
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-					GLint loc;
-
-			// draw fireworks particles
-			objId = 20;  //quad for particle
-
-			glUniform1i(texMode_uniformId, 2); // draw modulated textured particles 
-
-			for (int i = 0; i < MAX_PARTICULAS; i++) {
-
-				if (_particles[i]->getLife() > 0.0f){ // só desenha as que ainda estão vivas
-
-					// A vida da partícula representa o canal alpha da cor. Como o blend está activo a cor final é a soma da cor rgb do fragmento multiplicada pelo
-					//alpha com a cor do pixel destino 
-					particle_color[0] = _particles[i]->getColor().getX();
-					particle_color[1] = _particles[i]->getColor().getY();
-					particle_color[2] = _particles[i]->getColor().getZ();
-					particle_color[3] = _particles[i]->getLife();
-
-					// send the material - diffuse color modulated with texture
-					loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
-					glUniform4fv(loc, 1, particle_color);
-
-					pushMatrix(MODEL);
-					translate(MODEL, _particles[i]->getPosition().getX(), _particles[i]->getPosition().getY(), _particles[i]->getPosition().getZ());
-
-					// send matrices to OGL
-					computeDerivedMatrix(PROJ_VIEW_MODEL);
-					glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
-					glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
-					computeNormalMatrix3x3();
-					glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
-
-					glBindVertexArray(mesh[objId].vao);
-					glDrawElements(mesh[objId].type, mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
-					popMatrix(MODEL);
-				}
-			}
-		}
-
-		//------------------------------------------------------------------------------------------------
-
 		// ----------------- STENCIL RUBIK CUBE --------------------
 	
 			//------------------- RUBIK ------------------------------------
@@ -1024,41 +999,41 @@ void GameManager::renderScene(void) {
 			objId = 16;
 			_gameObject[15]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 
-		glEnable(GL_BLEND);
-		glEnable(GL_STENCIL_TEST);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-		glStencilMask(0xFF); // Write to stencil buffer
-		glDepthMask(GL_FALSE); // Don't write to depth buffer
-		glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+		
+				glEnable(GL_STENCIL_TEST);
+				glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+				glStencilMask(0xFF); // Write to stencil buffer
+				glDepthMask(GL_FALSE); // Don't write to depth buffer
+				glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
 
-			// Draw coaster
-			objId=15;
-			pushMatrix(MODEL);
-			translate(MODEL, 0.5f, 0.0f, -2.5f);
-			scale(MODEL, 4.0f, 0.5f, 4.0f);
-			_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			popMatrix(MODEL);
+					// Draw coaster
+					objId=15;
+					pushMatrix(MODEL);
+					translate(MODEL, 0.5f, 0.0f, -2.5f);
+					scale(MODEL, 4.0f, 0.5f, 4.0f);
+					_gameObject[14]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+					popMatrix(MODEL);
+					glEnable(GL_BLEND);
+					// Draw rubik cube reflection
+				   glStencilFunc(GL_EQUAL, 1, 0xFF);
+					glStencilMask(0x00);
+					glDepthMask(GL_TRUE);
 
-			// Draw rubik cube reflection
-           glStencilFunc(GL_EQUAL, 1, 0xFF);
-            glStencilMask(0x00);
-            glDepthMask(GL_TRUE);
-
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0);
-			objId=16;
-			pushMatrix(MODEL);
-			translate(MODEL, 0.0f, -3.0f, 0.0f);
-			_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			popMatrix(MODEL);
-		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_BLEND);
+				glEnable(GL_ALPHA_TEST);
+				glAlphaFunc(GL_GREATER, 0);
+					objId=16;
+					pushMatrix(MODEL);
+					translate(MODEL, 0.0f, -3.0f, 0.0f);
+					_gameObject[16]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+					popMatrix(MODEL);
+				glDisable(GL_BLEND);
+				glDisable(GL_ALPHA_TEST);
 			
-		glDisable(GL_STENCIL_TEST);
-		glDisable(GL_BLEND);
+				glDisable(GL_STENCIL_TEST);
+				glDisable(GL_BLEND);
 
 		// ----------------- STENCIL PARABRISAS --------------------
 /*
@@ -1106,6 +1081,55 @@ void GameManager::renderScene(void) {
 		_gameObject[12]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
 		glDisable(GL_BLEND);
 		glDisable(GL_ALPHA_TEST);
+
+		//-----------------------------------------PARTICLES---------------------------------------------
+		if (particles){
+
+			glDisable(GL_DEPTH_TEST); // não interessa o z-buffer: as partículas podem ser desenhadas umas por cima das outras sem problemas de ordenação 
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+			GLint loc;
+
+			// draw fireworks particles
+			objId = 20;  //quad for particle
+
+			//glUniform1i(texMode_uniformId, 15); // draw modulated textured particles 
+
+			for (int i = 0; i < MAX_PARTICULAS; i++) {
+
+				if (_particles[i]->getLife() > 0.0f){ // só desenha as que ainda estão vivas
+
+					// A vida da partícula representa o canal alpha da cor. Como o blend está activo a cor final é a soma da cor rgb do fragmento multiplicada pelo
+					//alpha com a cor do pixel destino 
+					particle_color[0] = _particles[i]->getColor().getX();
+					particle_color[1] = _particles[i]->getColor().getY();
+					particle_color[2] = _particles[i]->getColor().getZ();
+					particle_color[3] = _particles[i]->getLife();
+
+					// send the material - diffuse color modulated with texture
+					loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+					glUniform4fv(loc, 1, particle_color);
+					glUniform1i(texMode_uniformId, 15); 
+					pushMatrix(MODEL);
+					translate(MODEL, _particles[i]->getPosition().getX(), _particles[i]->getPosition().getY(), _particles[i]->getPosition().getZ());
+					
+					// send matrices to OGL
+					computeDerivedMatrix(PROJ_VIEW_MODEL);
+					glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+					glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+					computeNormalMatrix3x3();
+					glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+					glBindVertexArray(mesh[objId].vao);
+					glDrawElements(mesh[objId].type, mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+					popMatrix(MODEL);
+				}
+			}
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		}
+		//------------------------------------------------------------------------------------------------
 
 //Select orthogonal camera and draw cars(lives) left
 
@@ -1191,6 +1215,7 @@ GLuint GameManager::setupShaders() {
 	tex_loc10 = glGetUniformLocation(shader.getProgramIndex(), "texmap10");
 	tex_loc11 = glGetUniformLocation(shader.getProgramIndex(), "texmap11");
 	tex_loc12 = glGetUniformLocation(shader.getProgramIndex(), "texmap12");
+	tex_loc13 = glGetUniformLocation(shader.getProgramIndex(), "texmap13");
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -1218,7 +1243,7 @@ void GameManager::initParticles(){
 		_particles[i]->setSpeed(v * cos(theta) * sin(phi), v * cos(phi), v * sin(theta) * sin(phi));
 		_particles[i]->setAcceleration(0.1f, -0.15f, 0.0f);
 		_particles[i]->setColor(0.882f, 0.552f, 0.211f);
-		_particles[i]->setLife(1.0f);
+		_particles[i]->setLife(0.7f);
 		_particles[i]->setFade(0.005f);
 	}
 }
@@ -1245,7 +1270,7 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(15, TextureArray);
+	glGenTextures(14, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
@@ -1259,6 +1284,7 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "juice.tga", 10);
 	TGA_Texture(TextureArray, "rubik.tga", 11);
 	TGA_Texture(TextureArray, "rubik2.tga", 12);
+	TGA_Texture(TextureArray, "particula.tga", 13);
 
 	int auxId;
 	objId = 0;

@@ -29,6 +29,7 @@
 #include "Pot.h"
 #include "Sun.h"
 #include "Particle.h"
+#include "glbmp.h" 
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -50,7 +51,7 @@
 #define FPS 60
 #define frand()			((float)rand()/RAND_MAX)
 #define M_PI			3.14159265
-#define MAX_PARTICULAS  1500
+#define MAX_PARTICULAS  3000
 //---------------------------------------------------------------------------
 
 #ifndef GAMEMANAGER_H

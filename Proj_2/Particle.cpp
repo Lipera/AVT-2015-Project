@@ -74,7 +74,6 @@ void Particle::setAcceleration(float x, float y, float z){
 void Particle::create(struct MyMesh* mesh, int *objId){
 
 	int texcount = 0;
-
 	// create geometry and VAO of the quad for particles
 	*objId = 20;
 	mesh[*objId].mat.texCount = texcount;

@@ -55,6 +55,10 @@ GLuint setupShaders() {
 	return manager->setupShaders();
 }
 
+void iterate(int value){
+	manager->iterate(value);
+	glutTimerFunc(1000/60, iterate, 0);
+}
 
 //----------------------------------------------------------------------------
 //---------------------------------Main Function------------------------------
@@ -92,6 +96,7 @@ int main(int argc, char **argv) {
 	glutMotionFunc( processMouseMotion );
 	glutMouseWheelFunc ( mouseWheel ) ;
 	glutTimerFunc( 0,timer,0 );
+	//glutTimerFunc( 0,iterate,0 );
 	glutTimerFunc( 0, refresh, 0 );
 
 
