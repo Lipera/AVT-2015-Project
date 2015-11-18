@@ -52,7 +52,7 @@
 #define FPS 60
 #define frand()			((float)rand()/RAND_MAX)
 #define M_PI			3.14159265
-#define MAX_PARTICULAS  500
+#define MAX_PARTICULAS  900
 #define MAX_LENSFLARES 8
 //---------------------------------------------------------------------------
 

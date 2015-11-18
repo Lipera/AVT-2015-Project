@@ -36,7 +36,9 @@ public:
 	void draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId);
 	
 	float getFDistance();
+	void setFDistance(float fDistance);
 	float getFSize();
+	void setFSize(float fSize);
 };
 
 #endif

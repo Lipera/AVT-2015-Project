@@ -57,6 +57,7 @@ void LensFlare::create(struct MyMesh* mesh, int *objId){
 	memcpy(mesh[*objId].mat.emissive, emissive,4*sizeof(float));
 	mesh[*objId].mat.shininess = shininess;
 	mesh[*objId].mat.texCount = texcount;
+	//createQuad(2,2);
 	createCube();
 
 }
@@ -97,6 +98,7 @@ void LensFlare::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 			glUniform1f(loc,mesh[*objId].mat.shininess);
 			pushMatrix(MODEL);
 			translate(MODEL, getPosition().getX(), getPosition().getY(), getPosition().getZ());
+			//rotate(MODEL, 90, 0.0f, 1.0f, 0.0f);
 			scale(MODEL, 4.0f, 1.0f, 4.0f);
 
 			// send matrices to OGL
@@ -128,6 +130,14 @@ float LensFlare::getFDistance(){
 	return _fDistance;
 }
 
+void LensFlare::setFDistance(float fDistance) {
+	_fDistance = fDistance;
+}
+
 float LensFlare::getFSize(){
 	return _fSize;
+}
+
+void LensFlare::setFSize(float fSize) {
+	_fSize = fSize;
 }

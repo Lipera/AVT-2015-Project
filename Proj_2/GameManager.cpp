@@ -7,8 +7,8 @@
 #define SPOT_LIGHT_INDEX 7
 #define SPOT_LIGHT_NUM 2
 #define PI 3.14
-#define FLARE_SCALE 0.5f
-#define FLARE_MAX_SIZE 0.5f
+#define FLARE_SCALE 0.8f
+#define FLARE_MAX_SIZE 0.8f
 
 int n_lives = INITIAL_LIVES;
 
@@ -68,6 +68,7 @@ GLuint TextureArray[20];
 
 // Mouse Tracking Variables
 int startX, startY, tracking = 0;
+int endX, endY;
 
 // Camera Spherical Coordinates
 float alpha = 0.0f, beta = 0.0f;
@@ -186,16 +187,16 @@ GameManager::GameManager(){
 	int k;
 	for (k = 0; k<MAX_LENSFLARES; k++) {
 		//_lensFlare.push_back(new LensFlare(0));
-	if(k==0 || k==1){
-			_lensFlare.push_back(new LensFlare(0));
-			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
-		}else if(k==2 || k==3){
+	if(k==0 || k==7){
 			_lensFlare.push_back(new LensFlare(1));
 			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
-		}else if(k==4 || k==5){
+		}else if(k==1 || k==6){
+			_lensFlare.push_back(new LensFlare(0));
+			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
+		}else if(k==2 || k==5){
 			_lensFlare.push_back(new LensFlare(2));
 			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
-		}else if(k==6 || k==7){
+		}else if(k==3 || k==4){
 			_lensFlare.push_back(new LensFlare(3));
 			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
 		}
@@ -787,10 +788,13 @@ void GameManager::processMouseButtons(int button, int state, int xx, int yy){
 // -------------------------Track mouse motion while buttons are pressed-------------------------
 
 void GameManager::processMouseMotion(int xx, int yy){
-	if(camS == 2) {
+	if(camS == 2 && play) {
 		int deltaX, deltaY;
 		float alphaAux, betaAux;
 		float rAux;
+
+		endX = xx;
+		endY = yy;
 
 		deltaX =  - xx + startX;
 		deltaY =    yy - startY;
@@ -800,7 +804,7 @@ void GameManager::processMouseMotion(int xx, int yy){
 
 
 			alphaAux = alpha + deltaX;
-			betaAux = beta + deltaY;
+			betaAux = beta - deltaY;
 
 			/*if (betaAux > 85.0f)
 				betaAux = 85.0f;
@@ -872,7 +876,7 @@ void GameManager::flare_render(float lx, float ly, float cx, float cy) {
     dy = cy + (cy - ly);
 
     // Render each element.
-	for (i = 0; i < _lensFlare.size(); ++i)
+	for (i = 0; i < _lensFlare.size(); i++)
     {
 		element = _lensFlare[i];
 
@@ -964,10 +968,6 @@ void GameManager::renderScene(void) {
 		//send the light position in eye coordinates
 
 		//glUniform4fv(lPos_uniformId, 1, lightPos); //efeito capacete do mineiro, ou seja lighPos foi definido em eye coord 
-
-		//float res[4];
-		//multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
-		//glUniform4fv(lPos_uniformId, 1, res);
 
 		//Associar os Texture Units aos Objects Texture
 		//stone.tga loaded in TU0; checker.tga loaded in TU1;  lightwood.tga loaded in TU2
@@ -1255,8 +1255,17 @@ void GameManager::renderScene(void) {
 			 objId=21;
 
 			 computeDerivedMatrix(PROJ_VIEW_MODEL);
+
+			 //float res[4];
+			 //multMatrixPoint(VIEW, lightPos,res);   //lightPos definido em World Coord so it is converted to eye space
+			 //glUniform4fv(lPos_uniformId, 1, res);
  
-			 //flare_render(&renderFlare, xFlare, yFlare, SCREENwidth/2, SCREENheight/2);
+			 float xFlare = endX;
+			 float yFlare = endY;
+
+			 if(tracking == 1) {
+				flare_render(xFlare, yFlare, SCREENwidth/2, SCREENheight/2);
+			 }
 			 
 			 for (int j = 0; j<MAX_LENSFLARES; j++) {
 				_lensFlare[j]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
@@ -1392,10 +1401,16 @@ void GameManager::initParticles(){
 
 void GameManager::initLensFlares(){
 	int i;
+	float posDistance = 0.0f;
 	
-	for (i = 0; i<MAX_LENSFLARES; i++) {
+	for (i = 0; i < MAX_LENSFLARES; i++) {
 		_lensFlare[i]->setPosition(-3.5f*i+8, 0.0f, -3.5f*i+8);
-	
+		//_lensFlare[MAX_LENSFLARES-i]->setPosition(-3.5f*i+8, 0.0f, -3.5f*i+8);
+		_lensFlare[i]->setFDistance(posDistance);
+		posDistance += i/MAX_LENSFLARES;
+
+		_lensFlare[i]->setFSize(0.4f);
+
 	/*if(_lensFlare[i]->getTexture() == 0){
 				_lensFlare[i]->setPosition(1.0f*i+2, 0.0f, 1.0f*i+2);
 			}else if(_lensFlare[i]->getTexture() == 1){
@@ -1405,7 +1420,7 @@ void GameManager::initLensFlares(){
 			}else if(_lensFlare[i]->getTexture() == 3){
 				_lensFlare[i]->setPosition(0.0f, 0.0f, 0.0f);
 			}*/
-			}
+	}
 }
 
 
