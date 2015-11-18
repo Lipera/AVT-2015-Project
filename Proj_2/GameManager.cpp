@@ -58,10 +58,10 @@ GLint vm_uniformId;
 GLint normal_uniformId;
 GLint lPos_uniformId;
 GLint tex_loc, tex_loc1, tex_loc2, tex_loc3, tex_loc4, tex_loc5, tex_loc6, tex_loc7, tex_loc8, tex_loc9, tex_loc10;
-GLint tex_loc11, tex_loc12, tex_loc13;
+GLint tex_loc11, tex_loc12, tex_loc13, tex_loc14, tex_loc15, tex_loc16, tex_loc17;
 GLint texMode_uniformId;
 
-GLuint TextureArray[15];
+GLuint TextureArray[20];
 
 
 // Mouse Tracking Variables
@@ -118,6 +118,8 @@ GameManager::GameManager(){
 	_cameras.push_back(cam3);
 	Camera* cam4 = (Camera*) new PerspectiveCamera(53.13f, 1.0f, 0.1f,1000.0f);
 	_cameras.push_back(cam4);
+	Camera* cam5 = (Camera*) new OrthogonalCamera(-20.0f,20.0f,-20.0f,20.0f,-20.0f,100.0f);
+	_cameras.push_back(cam5);
 	
 	//---------auxId-------------
 
@@ -175,6 +177,25 @@ GameManager::GameManager(){
 	int j;
 	for (j = 0; j<MAX_PARTICULAS; j++){
 		_particles.push_back(new Particle());
+	}
+
+	//Lens Flares
+	int k;
+	for (k = 0; k<MAX_LENSFLARES; k++) {
+		_lensFlare.push_back(new LensFlare(0));
+		/*if(k==0 || k==1){
+			_lensFlare.push_back(new LensFlare(0));
+			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
+		}else if(k==2 || k==3){
+			_lensFlare.push_back(new LensFlare(1));
+			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
+		}else if(k==4 || k==5){
+			_lensFlare.push_back(new LensFlare(2));
+			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
+		}else if(k==6 || k==7){
+			_lensFlare.push_back(new LensFlare(3));
+			//((LensFlare*)_lensFlare[i])->setPosition(-20.0f + (i * 3.0f), 10.0f, 0.0f);
+		}*/
 	}
 
 //--------------------------------------Track------------------------------------
@@ -431,15 +452,8 @@ void GameManager::timer(int value){
 		float spotDirY = 0.0f;
 		float spotDirZ = sin((-_gameObject[8]->getAngle() * PI / 180.0f));
 
-		/*
-		Vector4 right_headlight = new Vector4(0.5f, 0.0f, 0.2f, 0.0f);
-		Vector4 left_headlight = new Vector4(0.5f, 0.0f, -0.2f, 0.0f);
-		Vector4 car_pos = new Vector4(_gameObject[8]->getPosition(), 1.0f);
-		Vector4 vec_dir = new Vector4(spotDirX, spotDirY, spotDirZ, 1.0f);
-		*/
-
-		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + 0.5f, _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() - 0.2f, 1.0f));
-		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + 0.5f, _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + 0.3f, 1.0f));
+		_lights[SPOT_LIGHT_INDEX]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (0.6f * spotDirX) + (0.15f * spotDirZ), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + (0.6f * spotDirZ) + (-0.15f * spotDirX), 1.0f));
+		_lights[SPOT_LIGHT_INDEX+1]->setPosition(new Vector4(_gameObject[8]->getPosition()->getX() + (0.6f * spotDirX) + (-0.25f * spotDirZ), _gameObject[8]->getPosition()->getY() + 0.2f, _gameObject[8]->getPosition()->getZ() + (0.6f * spotDirZ) + (0.25f * spotDirX), 1.0f));
 
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
@@ -922,6 +936,18 @@ void GameManager::renderScene(void) {
 		glActiveTexture(GL_TEXTURE13);
 		glBindTexture(GL_TEXTURE_2D, TextureArray[13]);
 
+		glActiveTexture(GL_TEXTURE14);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[14]);
+
+		glActiveTexture(GL_TEXTURE15);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[15]);
+
+		glActiveTexture(GL_TEXTURE16);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[16]);
+
+		glActiveTexture(GL_TEXTURE17);
+		glBindTexture(GL_TEXTURE_2D, TextureArray[17]);
+
 
 		//Indicar aos tres samplers do GLSL quais os Texture Units a serem usados
 		glUniform1i(tex_loc, 0);  
@@ -938,6 +964,10 @@ void GameManager::renderScene(void) {
 		glUniform1i(tex_loc11, 11);
 		glUniform1i(tex_loc12, 12);
 		glUniform1i(tex_loc13, 13);
+		glUniform1i(tex_loc14, 14);
+		glUniform1i(tex_loc15, 15);
+		glUniform1i(tex_loc16, 16);
+		glUniform1i(tex_loc17, 17);
 		
 		//Draw the lights
 		for(size_t i = 0; i < _lights.size(); i++) {
@@ -1129,53 +1159,170 @@ void GameManager::renderScene(void) {
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 		}
-		//------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------
 
-//Select orthogonal camera and draw cars(lives) left
+		//---------------------------------------LENS FLARE----------------------------------------------
 
-    glPushMatrix();
-    //glDisable(GL_LIGHTING);
-    _cameras[3]->computeProjectionMatrix();
-    _cameras[3]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-    for (int i = 0; i < n_lives; i++) {
-            pushMatrix(MODEL);
-			translate(MODEL, 18.0f, 0.0f, -17.0f + i * 1.5f);
-            scale(MODEL, 0.75f, 0.65f, 0.75f);
-            _lives[i]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-			computeDerivedMatrix(PROJ_VIEW_MODEL);
-			glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
-			glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
-			computeNormalMatrix3x3();
-			glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
-            popMatrix(MODEL);
-    }
+		//Select orthogonal camera and draw cars(lives) left
+
+		 glPushMatrix();
+		 _cameras[5]->computeProjectionMatrix();
+		 _cameras[5]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+		 objId = 21;  //quad for flares
+
+			for (int j = 0; j < MAX_LENSFLARES; j++) {
+				GLint loc;
+				// send the material
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+				glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+				glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+				glUniform4fv(loc, 1, mesh[objId].mat.specular);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+				glUniform1f(loc,mesh[objId].mat.shininess);
+				pushMatrix(MODEL);
+				//rotate(MODEL, 90, 0.0f, 1.0f, 0.0f);
+				translate(MODEL, 0.0f, 0.0f, 0.0f);
+				//translate(MODEL, _lensFlare[j]->getPosition().getX(), _lensFlare[j]->getPosition().getY(), _lensFlare[j]->getPosition().getZ());
+			
+
+				// send matrices to OGL
+				computeDerivedMatrix(PROJ_VIEW_MODEL);
+				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+				glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+				computeNormalMatrix3x3();
+				glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+				if(_lensFlare[j]->getTexture() == 0){
+					glUniform1i(texMode_uniformId, 16);
+				}else if(_lensFlare[j]->getTexture() == 1){
+					glUniform1i(texMode_uniformId, 17);
+				}else if(_lensFlare[j]->getTexture() == 2){
+					glUniform1i(texMode_uniformId, 18);
+				}else if(_lensFlare[j]->getTexture() == 3){
+					glUniform1i(texMode_uniformId, 19);
+				}
+
+				glBindVertexArray(mesh[objId].vao);
+				glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+
+				popMatrix(MODEL);
+			}
+			
+			//popMatrix(MODEL);
+				//para voltar a repor a camara do jogo
+		_cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+		//--------------------------------------------------------------------------------------------
+
+		//-----------------------------------------LIVES---------------------------------------------------
+
+		glPushMatrix();
+		//glDisable(GL_LIGHTING);
+		_cameras[3]->computeProjectionMatrix();
+		_cameras[3]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+		for (int i = 0; i < n_lives; i++) {
+				pushMatrix(MODEL);
+				translate(MODEL, 18.0f, 0.0f, -17.0f + i * 1.5f);
+				scale(MODEL, 0.75f, 0.65f, 0.75f);
+				_lives[i]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+				computeDerivedMatrix(PROJ_VIEW_MODEL);
+				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+				glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+				computeNormalMatrix3x3();
+				glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+				popMatrix(MODEL);
+		}
 
 
-    if (gameOver){
-		objId=11;
-       _gameObject[9]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-    }
+		if (gameOver){
+			objId=11;
+		   _gameObject[9]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+		}
     
-    if (!play){
-		objId=11;
-        _gameObject[10]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-    }
+		if (!play){
+			objId=11;
+			_gameObject[10]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+		}
 		
+			
+
+		
+			//renderBitmapString(0.0f,0.0f, "ola");
+
+		//para voltar a repor a camara do jogo
+		//_cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+
+		
+		//---------------------------------------LENS FLARE----------------------------------------------
+
+		//Select orthogonal camera and draw cars(lives) left
+
+		// glPushMatrix();
+		 //_cameras[5]->computeProjectionMatrix();
+		 //_cameras[5]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+		 objId = 21;  //quad for flares
+
+			for (int j = 0; j < MAX_LENSFLARES; j++) {
+				GLint loc;
+				// send the material
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.ambient");
+				glUniform4fv(loc, 1, mesh[objId].mat.ambient);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.diffuse");
+				glUniform4fv(loc, 1, mesh[objId].mat.diffuse);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.specular");
+				glUniform4fv(loc, 1, mesh[objId].mat.specular);
+				loc = glGetUniformLocation(shader.getProgramIndex(), "mat.shininess");
+				glUniform1f(loc,mesh[objId].mat.shininess);
+				pushMatrix(MODEL);
+				//rotate(MODEL, 90, 0.0f, 1.0f, 0.0f);
+				//translate(MODEL, 3.0f, 3.0f, 0.0f);
+				//translate(MODEL, _lensFlare[j]->getPosition().getX(), _lensFlare[j]->getPosition().getY(), _lensFlare[j]->getPosition().getZ());
+			
+
+				// send matrices to OGL
+				computeDerivedMatrix(PROJ_VIEW_MODEL);
+				glUniformMatrix4fv(vm_uniformId, 1, GL_FALSE, mCompMatrix[VIEW_MODEL]);
+				glUniformMatrix4fv(pvm_uniformId, 1, GL_FALSE, mCompMatrix[PROJ_VIEW_MODEL]);
+				computeNormalMatrix3x3();
+				glUniformMatrix3fv(normal_uniformId, 1, GL_FALSE, mNormal3x3);
+
+				if(_lensFlare[j]->getTexture() == 0){
+					glUniform1i(texMode_uniformId, 16);
+				}else if(_lensFlare[j]->getTexture() == 1){
+					glUniform1i(texMode_uniformId, 17);
+				}else if(_lensFlare[j]->getTexture() == 2){
+					glUniform1i(texMode_uniformId, 18);
+				}else if(_lensFlare[j]->getTexture() == 3){
+					glUniform1i(texMode_uniformId, 19);
+				}
+
+				glBindVertexArray(mesh[objId].vao);
+				glDrawElements(mesh[objId].type,mesh[objId].numIndexes, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+
+				popMatrix(MODEL);
+			}
+			
+			//popMatrix(MODEL);
+				//para voltar a repor a camara do jogo
+		_cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+		//--------------------------------------------------------------------------------------------
+
+			//Fog
+		GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
+		glUniform1i(loc, _isFogActive);
+		loc = glGetUniformLocation(shader.getProgramIndex(), "CameraHeight");
+		glUniform1f(loc, camY);
+
 		glBindTexture(GL_TEXTURE_2D, 0);		
-		glutSwapBuffers();
-
-		
-		//renderBitmapString(0.0f,0.0f, "ola");
-
-	//para voltar a repor a camara do jogo
-    _cameras[camS]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-		//Fog
-	GLint loc = glGetUniformLocation(shader.getProgramIndex(), "isFogActive");
-	glUniform1i(loc, _isFogActive);
-	loc = glGetUniformLocation(shader.getProgramIndex(), "CameraHeight");
-	glUniform1f(loc, camY);
-
-
+			glutSwapBuffers();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -1216,6 +1363,11 @@ GLuint GameManager::setupShaders() {
 	tex_loc11 = glGetUniformLocation(shader.getProgramIndex(), "texmap11");
 	tex_loc12 = glGetUniformLocation(shader.getProgramIndex(), "texmap12");
 	tex_loc13 = glGetUniformLocation(shader.getProgramIndex(), "texmap13");
+	tex_loc14 = glGetUniformLocation(shader.getProgramIndex(), "texmap14");
+	tex_loc15 = glGetUniformLocation(shader.getProgramIndex(), "texmap15");
+	tex_loc16 = glGetUniformLocation(shader.getProgramIndex(), "texmap16");
+	tex_loc17 = glGetUniformLocation(shader.getProgramIndex(), "texmap17");
+
 	
 	printf("InfoLog for Hello World Shader\n%s\n\n", shader.getAllInfoLogs().c_str());
 	
@@ -1248,6 +1400,14 @@ void GameManager::initParticles(){
 	}
 }
 
+void GameManager::initLensFlares(){
+	int i;
+	
+	for (i = 0; i<MAX_LENSFLARES; i++) {
+		_lensFlare[i]->setPosition(0.0f, 0.0f, 0.0f);
+	}
+}
+
 
 
 
@@ -1270,7 +1430,7 @@ void GameManager::init(){
 
 	//Texture Object definition
 	
-	glGenTextures(14, TextureArray);
+	glGenTextures(18, TextureArray);
 	TGA_Texture(TextureArray, "stone.tga", 0);
 	TGA_Texture(TextureArray, "checker.tga", 1);
 	TGA_Texture(TextureArray, "lightwood.tga", 2);
@@ -1285,6 +1445,10 @@ void GameManager::init(){
 	TGA_Texture(TextureArray, "rubik.tga", 11);
 	TGA_Texture(TextureArray, "rubik2.tga", 12);
 	TGA_Texture(TextureArray, "particula.tga", 13);
+	TGA_Texture(TextureArray, "Flare1.tga", 14);
+	TGA_Texture(TextureArray, "Flare2.tga", 15);
+	TGA_Texture(TextureArray, "Flare3.tga", 16);
+	TGA_Texture(TextureArray, "Flare4.tga", 17);
 
 	int auxId;
 	objId = 0;
@@ -1302,6 +1466,13 @@ void GameManager::init(){
 		_particles[auxId2]->create(mesh, &objId);
 	}
 	initParticles();
+
+	int auxId3;
+	objId = 21;
+	for (auxId3 = 0; auxId2<MAX_LENSFLARES; auxId3++){
+		_lensFlare[auxId3]->create(mesh, &objId);
+	}
+	//initLensFlares();
 	
 	// some GL settings
 	glEnable(GL_DEPTH_TEST);

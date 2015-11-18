@@ -30,6 +30,7 @@
 #include "Sun.h"
 #include "Particle.h"
 #include "glbmp.h" 
+#include "LensFlare.h"
 
 // Use Very Simple Libs
 #include "VSShaderlib.h"
@@ -51,7 +52,8 @@
 #define FPS 60
 #define frand()			((float)rand()/RAND_MAX)
 #define M_PI			3.14159265
-#define MAX_PARTICULAS  3000
+#define MAX_PARTICULAS  500
+#define MAX_LENSFLARES 8
 //---------------------------------------------------------------------------
 
 #ifndef GAMEMANAGER_H
@@ -70,6 +72,7 @@ private:
 	std::vector<GameObject*> _track;
 	std::vector<LightSource*> _lights;
 	std::vector<Particle*> _particles;
+	std::vector<LensFlare*> _lensFlare;
 
 public:
     GameManager();
@@ -92,12 +95,14 @@ public:
 	void renderScene();
 	void init();
 	void initParticles();
+	void initLensFlares();
 	void iterate(int value);
 	void timer(int value);
 	GLuint setupShaders();
 	bool collision(GameObject *obj1, GameObject *obj2, Vector3 *obj1_position, Vector3 *obj2_position);
 	void track();
 	void reorganizeGame();
+	
 
 };
 
