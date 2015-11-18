@@ -232,27 +232,27 @@ void main() {
 	else if(texMode == 15) // modulate diffuse color with texel color
 	{
 		texel4 = texture(texmap13, DataIn.tex_coord);  // texel from particula.tga
-		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), mat.diffuse.w);
 	}	
 	else if(texMode == 16) // modulate diffuse color with texel color
 	{
 		texel4 = texture(texmap14, DataIn.tex_coord);  // texel from  Flare1.tga
-		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), mat.diffuse.w);
 	}	
 	else if(texMode == 17) // modulate diffuse color with texel color
 	{
 		texel4 = texture(texmap15, DataIn.tex_coord);  // texel from  Flare1.tga
-		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), mat.diffuse.w);
 	}	
 	else if(texMode == 18) // modulate diffuse color with texel color
 	{
 		texel4 = texture(texmap16, DataIn.tex_coord);  // texel from  Flare1.tga
-		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), mat.diffuse.w);
 	}	
 	else if(texMode == 19) // modulate diffuse color with texel color
 	{
 		texel4 = texture(texmap17, DataIn.tex_coord);  // texel from  Flare1.tga
-		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), texel4.w);
+		colorOut += vec4(max(vec3(mat.diffuse)*vec3(texel4), 0.1*vec3(texel4)), mat.diffuse.w);
 	}
 
 	//----------------------------------------FOG -------------------------------------------------

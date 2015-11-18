@@ -1,4 +1,5 @@
 #include "StaticObject.h"
+#include "Vector4.h"
 #include <math.h>
 
 #ifndef LENS_FLARE_H
@@ -8,25 +9,34 @@
 class LensFlare : public StaticObject{
 
 private:
-	float _fScale;		// Scale factor for adjusting overall size of flare elements.
-	float _fMaxSize;	// Max size of largest element, as proportion of screen width (0.0-1.0)
-	int _nPieces;		// Number of elements in use
+	float _fDistance;        // Distance along ray from source (0.0-1.0)
+    float _fSize;            // Size relative to flare envelope (0.0-1.0)
 	int _texture;
+	float _width;
+	float _height;
 	Vector3 _position;
-	Vector3 _color;
+	Vector4 _color;
+
 
 public:
     LensFlare(int value);
     ~LensFlare();
 	void setTexture(int value);
 	int getTexture();
+	float getWidth();
+	void setWidth(float width);
+	float getHeight();
+	void setHeight(float height);
 	void setPosition(float x, float y, float z);
 	Vector3 getPosition();
-	void setColor(float r, float g, float b);
-	Vector3 getColor();
+	void setColor(float r, float g, float b, float a);
+	void setAlpha(float a);
+	Vector4 getColor();
     void create(struct MyMesh* mesh, int *objId);
 	void draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_uniformId, GLint& vm_uniformId, GLint& normal_uniformId, GLint& texMode_uniformId, int *objId);
 	
+	float getFDistance();
+	float getFSize();
 };
 
 #endif

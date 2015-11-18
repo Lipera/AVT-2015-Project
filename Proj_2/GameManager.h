@@ -66,6 +66,7 @@ private:
 	int _WinY;
 	int _WindowHandle;
 	bool _isFogActive;
+	bool _isFlaresActive;
 	std::vector<GameObject*> _gameObject;
 	std::vector<Camera*> _cameras;
 	std::vector<GameObject*> _lives;
@@ -102,7 +103,8 @@ public:
 	bool collision(GameObject *obj1, GameObject *obj2, Vector3 *obj1_position, Vector3 *obj2_position);
 	void track();
 	void reorganizeGame();
-	
+	void checkSun();
+	void flare_render(float lx, float ly, float cx, float cy);
 
 };
 

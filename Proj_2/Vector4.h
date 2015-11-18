@@ -19,6 +19,7 @@ public:
 	float getZ();
 	float getW();
 	void set(float x, float y, float z, float w);
+	void setW(float w);
     Vector4* operator=(Vector4 &vec);
 	Vector4* operator*(float num);
 	Vector4* operator+(Vector4 &vec);

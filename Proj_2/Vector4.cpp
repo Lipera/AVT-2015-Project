@@ -41,6 +41,10 @@ void Vector4::set(float x, float y, float z, float w){
     _xyz->set(x, y, z);
 }
 
+void Vector4::setW(float w) {
+	_w = w;
+}
+
 Vector4* Vector4::operator=(Vector4 &vec){
 	_xyz->set((&vec)->getX(), (&vec)->getY(), (&vec)->getZ());
 	_w = vec.getW();

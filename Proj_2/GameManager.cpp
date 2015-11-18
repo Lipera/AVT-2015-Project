@@ -7,6 +7,8 @@
 #define SPOT_LIGHT_INDEX 7
 #define SPOT_LIGHT_NUM 2
 #define PI 3.14
+#define FLARE_SCALE 0.5f
+#define FLARE_MAX_SIZE 0.5f
 
 int n_lives = INITIAL_LIVES;
 
@@ -233,6 +235,8 @@ GameManager::GameManager(){
 
 	//Fog
 	_isFogActive = false;
+
+	_isFlaresActive = false;
 }
 
 //Organize the track
@@ -431,6 +435,12 @@ void GameManager::iterate(int value){
 	
 }
 
+//--------------------------------------Check Sun ---------------------------------------
+
+void GameManager::checkSun() {
+
+}
+
 // -------------------------------------Timer--------------------------------------------
 
 void GameManager::timer(int value){
@@ -459,6 +469,7 @@ void GameManager::timer(int value){
 		_lights[SPOT_LIGHT_INDEX]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 		_lights[SPOT_LIGHT_INDEX+1]->setSpotDirection(new Vector4(spotDirX, spotDirY, spotDirZ, 0.0f));
 
+		checkSun();
 	}
 
 	
@@ -622,6 +633,13 @@ void GameManager::processKeys(unsigned char key, int xx, int yy){
 			particles = true;
 			initParticles();
 			break;
+
+		case 'L' :
+		case 'l':   
+			if(camS == 2 && play) {
+				_isFlaresActive = !_isFlaresActive; 
+			}
+		   break;
 
 		case '1':	if(play){
 						camS = 0; 
@@ -829,6 +847,65 @@ void GameManager::mouseWheel(int wheel, int direction, int x, int y) {
 // ----------------------------------------------------------------------------------------
 // Render stuff
 //---------------------------------------------------------------------------------------
+void GameManager::flare_render(float lx, float ly, float cx, float cy) {
+	float dx, dy;		   // Screen coordinates of "destination"
+	float px, py;          // Screen coordinates of flare element
+	float maxflaredist, flaredist, flaremaxsize, flarescale, distanceScale;
+    float width, height, alpha, aspectRatio;    // Piece parameters;
+    int i;
+    LensFlare *element;
+
+	float SCREENwidth = glutGet( GLUT_WINDOW_WIDTH );
+	float SCREENheight = glutGet( GLUT_WINDOW_HEIGHT );
+
+    // Compute how far off-center the flare source is.
+    maxflaredist = sqrt(cx * cx + cy * cy);
+    flaredist = sqrt((lx - cx) * (lx - cx) + (ly - cy) * (ly - cy));
+    flaredist = (maxflaredist - flaredist);
+	flaremaxsize = (SCREENwidth * FLARE_MAX_SIZE);
+	flarescale = (SCREENwidth * FLARE_SCALE);
+
+	distanceScale = (maxflaredist - flaredist) / maxflaredist;
+
+    // Destination is opposite side of centre from source
+    dx = cx + (cx - lx);
+    dy = cy + (cy - ly);
+
+    // Render each element.
+	for (i = 0; i < _lensFlare.size(); ++i)
+    {
+		element = _lensFlare[i];
+
+        // Position is interpolated along line between start and destination.
+		px = (1.0f - element->getFDistance()) * lx + element->getFDistance() * dx;
+		py = (1.0f - element->getFDistance()) * ly + element->getFDistance() * dy;
+
+        // Piece size are 0 to 1; flare size is proportion of
+        // screen width; scale by flaredist/maxflaredist.
+		width = (flaredist * flarescale * element->getFSize()) / maxflaredist;
+
+        // Width gets clamped, to allows the off-axis flares
+        // to keep a good size without letting the elements get
+        // too big when centered.
+        if (width > flaremaxsize)
+        {
+            width = flaremaxsize;
+        }
+
+        // Flare elements are square (round) so height is just
+        // width scaled by aspect ratio.
+		aspectRatio = SCREENwidth / SCREENheight;
+
+		height = width * aspectRatio;
+
+		alpha = element->getColor().getW();
+		element->setAlpha(alpha * distanceScale);
+		element->setPosition(px - width/2, element->getPosition().getY(), py - height/2);
+		element->setWidth(width);
+		element->setHeight(height);
+    }
+}
+
 
 void GameManager::renderScene(void) {
 
@@ -1165,17 +1242,28 @@ void GameManager::renderScene(void) {
 		//---------------------------------------LENS FLARE----------------------------------------------
 
 		//Select orthogonal camera and draw cars(lives) left
+		if(_isFlaresActive && camS == 2) {
+			float SCREENwidth = glutGet( GLUT_WINDOW_WIDTH );
+			float SCREENheight = glutGet( GLUT_WINDOW_HEIGHT ); 
 
-		 glPushMatrix();
-		 _cameras[5]->computeProjectionMatrix();
-		 _cameras[5]->computeVisualizationMatrix(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-		 glEnable(GL_BLEND);
-		 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		 objId=21;
-		 for (int j = 0; j<MAX_LENSFLARES; j++) {
-			_lensFlare[j]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
-		 }	
-		 glDisable(GL_BLEND);
+			 glPushMatrix();
+			 _cameras[5]->computeProjectionMatrix();
+			 _cameras[5]->computeVisualizationMatrix(SCREENwidth, SCREENheight);
+
+			 glEnable(GL_BLEND);
+			 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			 objId=21;
+
+			 computeDerivedMatrix(PROJ_VIEW_MODEL);
+ 
+			 //flare_render(&renderFlare, xFlare, yFlare, SCREENwidth/2, SCREENheight/2);
+			 
+			 for (int j = 0; j<MAX_LENSFLARES; j++) {
+				_lensFlare[j]->draw(mesh, shader, pvm_uniformId, vm_uniformId, normal_uniformId, texMode_uniformId, &objId);
+			 }	
+			 glDisable(GL_BLEND);
+
+		 }
 
 		//-------------------------------------------------------------------------------------------
 

@@ -23,6 +23,21 @@ int LensFlare::getTexture(){
 	return _texture;
 }
 
+float LensFlare::getWidth() {
+	return _width;
+}
+
+void LensFlare::setWidth(float width) {
+	_width = width;
+}
+
+float LensFlare::getHeight() {
+	return _height;
+}
+
+void LensFlare::setHeight(float height) {
+	_height = height;
+}
 
 //desenha mesa
 void LensFlare::create(struct MyMesh* mesh, int *objId){
@@ -54,11 +69,15 @@ Vector3 LensFlare::getPosition(){
 	return _position;
 }
 
-void LensFlare::setColor(float r, float g, float b){
-	_color.set(r, g, b);
+void LensFlare::setColor(float r, float g, float b, float a){
+	_color.set(r, g, b, a);
 }
 
-Vector3 LensFlare::getColor(){
+void LensFlare::setAlpha(float a) {
+	_color.setW(a);
+}
+
+Vector4 LensFlare::getColor(){
 	return _color;
 }
 
@@ -103,4 +122,12 @@ void LensFlare::draw(struct MyMesh* mesh, VSShaderLib& shader, GLint& pvm_unifor
 
 			popMatrix(MODEL);
 
+}
+
+float LensFlare::getFDistance(){
+	return _fDistance;
+}
+
+float LensFlare::getFSize(){
+	return _fSize;
 }
